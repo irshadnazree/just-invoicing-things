@@ -22,6 +22,8 @@ todos.json
 .pnpm-store
 
 # AI Agents
-.claude
-.cursor
-.opencode
+.agents/
+.claude/
+.cursor/
+.opencode/
+.taste-skill/
