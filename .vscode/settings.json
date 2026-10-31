@@ -18,5 +18,21 @@
   },
   "oxc.enable": true,
   "oxc.lint.run": "onType",
-  "oxc.formatter.enable": true
+  "oxc.formatter.enable": true,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#55c2bc",
+    "activityBar.foreground": "#1a1a1a",
+    "activityBar.inactiveForeground": "#1a1a1a99",
+    "activityBarBadge.background": "#1a1a1a",
+    "activityBarBadge.foreground": "#55c2bc",
+    "statusBar.background": "#55c2bc",
+    "statusBar.foreground": "#1a1a1a",
+    "statusBarItem.hoverBackground": "#3fa9a3",
+    "titleBar.activeBackground": "#55c2bc",
+    "titleBar.activeForeground": "#1a1a1a",
+    "titleBar.inactiveBackground": "#55c2bc99",
+    "titleBar.inactiveForeground": "#1a1a1a99",
+    "focusBorder": "#55c2bc",
+    "progressBar.background": "#55c2bc"
+  }
 }
