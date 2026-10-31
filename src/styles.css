@@ -8,7 +8,7 @@
     --background: oklch(1 0 0);
     --foreground: oklch(0.9702 0 0);
     --text: oklch(0.235 0 0);
-    --primary: oklch(0.75 0.1 190);
+    --primary: oklch(0.52 0.09 190);
     --error: oklch(0.65 0.15 20);
     --success: oklch(0.72 0.17 155);
     --warning: oklch(0.8 0.15 85);
@@ -27,7 +27,7 @@
     --success: oklch(0.68 0.15 155);
     --warning: oklch(0.75 0.13 85);
     --muted: oklch(0.6 0 0);
-    --muted-foreground: oklch(0.5 0 0);
+    --muted-foreground: oklch(0.68 0 0);
   }
 
   /* Tailwind Theme Mappings */
@@ -41,6 +41,9 @@
     --color-warning: var(--warning);
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
+    --color-input: var(--text);
+    --color-border: var(--text);
+    --color-card: var(--background);
     --font-sans: "Geist Variable", sans-serif;
     --font-mono: "Geist Mono Variable", monospace;
   }

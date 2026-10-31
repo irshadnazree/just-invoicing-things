@@ -96,10 +96,10 @@ function RouteComponent() {
       key: "invoiceId",
       label: "Id",
       width: "w-[15%]",
-      cellClassName: "whitespace-nowrap font-medium font-mono",
+      cellClassName: "whitespace-nowrap font-medium tabular-nums",
       renderCell: (invoice) => (
         <button
-          className="block max-w-full cursor-pointer truncate text-primary transition-opacity hover:opacity-80 font-mono"
+          className="block max-w-full cursor-pointer truncate text-primary transition-opacity hover:opacity-80 tabular-nums"
           onClick={() => handleOpenInvoice(invoice.id)}
           title={invoice.invoiceId || "No ID"}
           type="button"
@@ -130,7 +130,7 @@ function RouteComponent() {
       key: "total",
       label: "Total",
       width: "w-[15%]",
-      cellClassName: "whitespace-nowrap font-mono",
+      cellClassName: "whitespace-nowrap tabular-nums",
       renderCell: (invoice) => formatCurrency(invoice.total, invoice.currency),
     },
   ];
@@ -225,16 +225,17 @@ function RouteComponent() {
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center md:gap-0">
         <div className="flex items-center gap-4">
           <h1 className="text-3xl font-bold">Invoices</h1>
-          <Button
-            aria-label="Create invoice"
-            icon={<Receipt className="size-4 xl:size-5" weight="duotone" />}
-            onClick={handleCreateInvoice}
-            size="sm"
-          >
-            New Invoice
-          </Button>
+          {invoices.length > 0 && (
+            <Button
+              icon={<Receipt className="size-4 xl:size-5" weight="duotone" />}
+              onClick={handleCreateInvoice}
+              size="sm"
+            >
+              New Invoice
+            </Button>
+          )}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex w-full items-center gap-4 md:w-auto">
           {selectedInvoices.size > 0 && (
             <Button
               aria-label="Delete selected"

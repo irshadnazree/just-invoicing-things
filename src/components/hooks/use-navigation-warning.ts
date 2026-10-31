@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 
 export type UseNavigationWarningProps = {
   enabled: boolean;
+  /** Paths that can be visited without a warning, e.g. a preview that keeps the draft */
+  allowedPaths?: string[];
   title?: string;
   description?: string;
   confirmLabel?: string;
@@ -21,6 +23,7 @@ export type NavigationWarningState = {
 
 export function useNavigationWarning({
   enabled,
+  allowedPaths = [],
   title = "Unsaved Changes",
   description = "You have unsaved changes. Are you sure you want to leave?",
   confirmLabel = "Leave",
@@ -34,7 +37,10 @@ export function useNavigationWarning({
 
   // Block navigation when enabled
   const blocker = useBlocker({
-    condition: enabled,
+    shouldBlockFn: ({ next }) =>
+      enabled && !allowedPaths.includes(next.pathname),
+    enableBeforeUnload: false,
+    withResolver: true,
   });
 
   useEffect(() => {

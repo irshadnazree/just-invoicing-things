@@ -26,8 +26,9 @@ export default function EmptyListView({
       <Button
         icon={<PlusIcon className="size-4 xl:size-5" size={20} weight="bold" />}
         onClick={handleCreate}
+        size="sm"
       >
-        Create {title}
+        Create {itemLabel}
       </Button>
     </div>
   );

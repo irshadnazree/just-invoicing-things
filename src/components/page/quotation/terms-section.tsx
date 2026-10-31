@@ -40,14 +40,16 @@ export default function TermsSection() {
         <h3 className="border-text font-semibold text-lg">
           Terms and Conditions Details
         </h3>
-        <Button
-          icon={<PlusIcon size={22} weight="bold" />}
-          onClick={handleAddTerm}
-          size="sm"
-          variant="ghost"
-        >
-          Add Term
-        </Button>
+        {terms.length > 0 && (
+          <Button
+            icon={<PlusIcon size={22} weight="bold" />}
+            onClick={handleAddTerm}
+            size="sm"
+            variant="ghost"
+          >
+            Add Term
+          </Button>
+        )}
       </div>
       <div className="flex flex-col gap-2">
         {terms.length === 0 && (

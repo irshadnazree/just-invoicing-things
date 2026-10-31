@@ -53,8 +53,10 @@ export function deleteInvoicesFromStorage(ids: string[]): void {
 export function isInvoiceValid(invoiceData: InvoiceFormData): boolean {
   // Check required fields are not empty
   const hasInvoiceId = invoiceData.invoiceId.trim() !== "";
-  // Add more validation if needed
-  return hasInvoiceId;
+  // invoiceId and invoiceDate are generated, so require something the user entered
+  const hasClient = invoiceData.invoiceTo.company.trim() !== "";
+  const hasItems = invoiceData.items.length > 0;
+  return hasInvoiceId && (hasClient || hasItems);
 }
 
 export function saveInvoiceToArray(invoiceData: InvoiceFormData): boolean {

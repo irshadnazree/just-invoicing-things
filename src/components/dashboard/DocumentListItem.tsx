@@ -134,7 +134,7 @@ export function DocumentListItem({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">
-        <span className="font-mono font-medium text-sm text-primary">
+        <span className="tabular-nums font-medium text-sm text-primary">
           {documentId}
         </span>
         <span className="block truncate text-sm text-text" title={client}>
@@ -142,7 +142,7 @@ export function DocumentListItem({
         </span>
       </div>
 
-      <div className="hidden shrink-0 font-mono font-medium text-sm text-text sm:block">
+      <div className="hidden shrink-0 tabular-nums font-medium text-sm text-text sm:block">
         {formatCurrency(total, currency)}
       </div>
 

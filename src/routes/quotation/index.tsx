@@ -103,10 +103,10 @@ function RouteComponent() {
       key: "quotationId",
       label: "Id",
       width: "w-[12%]",
-      cellClassName: "whitespace-nowrap font-medium font-mono",
+      cellClassName: "whitespace-nowrap font-medium tabular-nums",
       renderCell: (quotation) => (
         <button
-          className="block max-w-full cursor-pointer truncate text-primary transition-opacity hover:opacity-80 font-mono"
+          className="block max-w-full cursor-pointer truncate text-primary transition-opacity hover:opacity-80 tabular-nums"
           onClick={() => handleOpenQuotation(quotation.id)}
           title={quotation.quotationId || "No ID"}
           type="button"
@@ -148,7 +148,7 @@ function RouteComponent() {
       key: "total",
       label: "Total",
       width: "w-[10%]",
-      cellClassName: "whitespace-nowrap font-mono",
+      cellClassName: "whitespace-nowrap tabular-nums",
       renderCell: (quotation) =>
         formatCurrency(quotation.total, quotation.currency),
     },
@@ -244,16 +244,17 @@ function RouteComponent() {
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center md:gap-0">
         <div className="flex items-center gap-4">
           <h1 className="text-3xl font-bold">Quotations</h1>
-          <Button
-            aria-label="Create quotation"
-            icon={<FileText className="size-4 xl:size-5" weight="duotone" />}
-            onClick={handleCreateQuotation}
-            size="sm"
-          >
-            New Quotation
-          </Button>
+          {quotations.length > 0 && (
+            <Button
+              icon={<FileText className="size-4 xl:size-5" weight="duotone" />}
+              onClick={handleCreateQuotation}
+              size="sm"
+            >
+              New Quotation
+            </Button>
+          )}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex w-full items-center gap-4 md:w-auto">
           {selectedQuotations.size > 0 && (
             <Button
               aria-label="Delete selected"

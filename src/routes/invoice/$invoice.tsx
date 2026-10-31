@@ -4,7 +4,7 @@ import {
   EyeIcon,
   UploadIcon,
 } from "@phosphor-icons/react";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
 import { useNavigationWarning } from "@/components/hooks/use-navigation-warning";
@@ -27,6 +27,7 @@ function RouteComponent() {
   const router = useRouter();
   const { add } = useToastManager();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasPendingSave = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const { formData, importJSON, loadInvoice, initializeInvoice, saveInvoice } =
@@ -37,7 +38,11 @@ function RouteComponent() {
     formData.id &&
     formData.id !== "" &&
     !isInvoiceValid(formData) &&
-    (formData.invoiceId.trim() !== "" || formData.items.length > 0)
+    (formData.invoiceFrom.company.trim() !== "" ||
+      formData.invoiceTo.company.trim() !== "" ||
+      formData.bankAccount.trim() !== "" ||
+      formData.reductionAmount !== 0 ||
+      formData.items.length > 0)
   );
 
   // Setup navigation warning
@@ -51,6 +56,7 @@ function RouteComponent() {
     cancelLabel,
   } = useNavigationWarning({
     enabled: hasUnsavedChanges,
+    allowedPaths: ["/invoice/preview"],
     title: "Unsaved Changes",
     description:
       "You have started filling out this invoice but haven't saved it yet. If you leave now, your progress will be lost.",
@@ -60,10 +66,19 @@ function RouteComponent() {
 
   // Load invoice on component mount
   useEffect(() => {
+    // Persist the previous invoice's last edits before replacing it in the store
+    if (hasPendingSave.current) {
+      hasPendingSave.current = false;
+      saveInvoice();
+    }
     if (invoiceId === "new") {
       // Create new invoice
       initializeInvoice();
     } else {
+      // An unsaved draft is only in memory, so keep it rather than reloading from storage
+      if (useInvoiceStore.getState().formData.id === invoiceId) {
+        return;
+      }
       // Try to load existing invoice
       const loaded = loadInvoice(invoiceId);
       if (!loaded) {
@@ -75,29 +90,45 @@ function RouteComponent() {
         });
       }
     }
-  }, [invoiceId, loadInvoice, initializeInvoice, router]);
+  }, [invoiceId, loadInvoice, initializeInvoice, router, saveInvoice]);
 
   // Auto-save when form data changes with debounce
   useEffect(() => {
-    if (formData.id && formData.id !== "") {
-      setIsSaving(true);
-
-      const timeoutId = setTimeout(() => {
-        const success = saveInvoice();
-        setIsSaving(false);
-
-        // Only show toast on error, success is shown via SaveIndicator
-        if (!success) {
-          add({
-            title: "Failed to save invoice",
-            type: "error",
-          });
-        }
-      }, 1000); // Debounce save by 1 second
-
-      return () => clearTimeout(timeoutId);
+    if (!formData.id || !isInvoiceValid(formData)) {
+      setIsSaving(false);
+      return;
     }
+
+    setIsSaving(true);
+    hasPendingSave.current = true;
+
+    const timeoutId = setTimeout(() => {
+      hasPendingSave.current = false;
+      const success = saveInvoice();
+      setIsSaving(false);
+
+      // Only show toast on error, success is shown via SaveIndicator
+      if (!success) {
+        add({
+          title: "Failed to save invoice",
+          type: "error",
+        });
+      }
+    }, 1000); // Debounce save by 1 second
+
+    return () => clearTimeout(timeoutId);
   }, [formData, saveInvoice, add]);
+
+  // Leaving within the debounce window would otherwise drop the last edits
+  useEffect(
+    () => () => {
+      if (hasPendingSave.current) {
+        hasPendingSave.current = false;
+        saveInvoice();
+      }
+    },
+    [saveInvoice]
+  );
 
   const handleExportJSON = () => {
     const exportData = {
@@ -139,36 +170,31 @@ function RouteComponent() {
             {invoiceId === "new" ? "Create Invoice" : "Edit Invoice"}
           </h1>
 
-          <Link to="/invoice">
-            <Button
-              aria-label="Go back"
-              icon={
-                <ArrowUUpLeftIcon
-                  className="size-4 xl:size-5"
-                  size={20}
-                  weight="bold"
-                />
-              }
-              size="sm"
-            />
-          </Link>
+          <Button
+            aria-label="Go back"
+            icon={
+              <ArrowUUpLeftIcon
+                className="size-4 xl:size-5"
+                size={20}
+                weight="bold"
+              />
+            }
+            onClick={() => router.navigate({ to: "/invoice" })}
+            size="sm"
+          />
           <SaveIndicator show={isSaving} />
         </div>
         <div className="flex items-center gap-1 xl:gap-2">
           {formData.id && formData.id !== "" && (
-            <Link to="/invoice/preview">
-              <Button
-                aria-label="Preview"
-                icon={
-                  <EyeIcon
-                    className="size-4 xl:size-5"
-                    size={20}
-                    weight="bold"
-                  />
-                }
-                size="sm"
-              />
-            </Link>
+            <Button
+              icon={
+                <EyeIcon className="size-4 xl:size-5" size={20} weight="bold" />
+              }
+              onClick={() => router.navigate({ to: "/invoice/preview" })}
+              size="sm"
+            >
+              Preview
+            </Button>
           )}
 
           <Button

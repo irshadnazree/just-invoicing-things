@@ -13,7 +13,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-10 mx-auto w-full max-w-400 bg-background/25 px-4 pt-4 backdrop-blur-sm md:px-8 lg:px-16 xl:px-25 xl:pt-6 print:hidden">
+    <nav className="sticky top-0 z-10 mx-auto w-full max-w-400 bg-background/95 px-4 pt-4 backdrop-blur-sm md:px-8 lg:px-16 xl:px-25 xl:pt-6 print:hidden">
       <div className="item-start flex justify-between xl:items-center">
         <Link to="/">
           <span className="text-xl xl:text-2xl">Just Accounting Things</span>

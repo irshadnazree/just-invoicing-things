@@ -66,14 +66,16 @@ export default function LineItemSection() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between border-b-2 pb-1">
         <h3 className="border-text font-semibold text-lg">Line Items</h3>
-        <Button
-          icon={<PlusIcon size={18} weight="bold" />}
-          onClick={handleAddItem}
-          size="sm"
-          variant="ghost"
-        >
-          Add Item
-        </Button>
+        {items.length > 0 && (
+          <Button
+            icon={<PlusIcon size={18} weight="bold" />}
+            onClick={handleAddItem}
+            size="sm"
+            variant="ghost"
+          >
+            Add Item
+          </Button>
+        )}
       </div>
       <div className="flex flex-col gap-6">
         {items.length === 0 && (
@@ -175,7 +177,7 @@ export default function LineItemSection() {
                 <FormLabel id="item-amount" label="Amount" />
                 <Input
                   disabled
-                  className="font-mono"
+                  className="tabular-nums"
                   id={`item-amount-${itemIndex}`}
                   type="text"
                   value={formatCurrency(

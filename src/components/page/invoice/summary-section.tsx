@@ -55,23 +55,23 @@ export default function SummarySection({ onUpdateField }: SummarySectionProps) {
           />
         </FormField>
 
-        <div className="col-span-2 flex flex-col gap-4">
+        <div className="flex flex-col gap-4 xl:col-span-2">
           <Card className="flex flex-col gap-1">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span className="font-mono">
+              <span className="tabular-nums">
                 {formatCurrency(subtotal, currency)}
               </span>
             </div>
             <div className="flex justify-between text-primary">
               <span>Reductions</span>
-              <span className="font-mono">
+              <span className="tabular-nums">
                 ({formatCurrency(reductionAmount, currency)})
               </span>
             </div>
             <div className="flex justify-between border-t pt-2 font-bold text-xl">
               <span>Total ({currency})</span>
-              <span className="font-mono">
+              <span className="tabular-nums">
                 {formatCurrency(total, currency)}
               </span>
             </div>

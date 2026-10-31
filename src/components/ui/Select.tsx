@@ -22,7 +22,7 @@ export type SelectProps = {
 };
 
 const baseSelectClasses =
-  "max-h-9.5 w-full border border-input bg-foreground/50 px-3 py-2 leading-tight focus:outline-none focus:ring-1 focus:ring-text/80 disabled:cursor-not-allowed disabled:opacity-50";
+  "max-h-9.5 w-full border border-input bg-foreground px-3 py-2 leading-tight focus:outline-none focus:ring-1 focus:ring-text/80 disabled:cursor-not-allowed disabled:opacity-50";
 
 export function Select({
   id,

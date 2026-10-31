@@ -154,29 +154,35 @@ function Dashboard() {
     navigate({ to: "/quotation" });
   };
 
+  const isEmpty = !isLoading && !error && !hasDocuments;
+
   return (
     <div className="flex flex-col gap-8">
       {/* Header Section */}
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold text-text">Dashboard</h1>
-        <div className="flex gap-3">
-          <Button
-            icon={<ReceiptIcon className="size-4 xl:size-5" weight="duotone" />}
-            onClick={handleNewInvoice}
-            size="sm"
-          >
-            New Invoice
-          </Button>
-          <Button
-            icon={
-              <FileTextIcon className="size-4 xl:size-5" weight="duotone" />
-            }
-            onClick={handleNewQuotation}
-            size="sm"
-          >
-            New Quotation
-          </Button>
-        </div>
+        {!isEmpty && (
+          <div className="flex gap-3">
+            <Button
+              icon={
+                <ReceiptIcon className="size-4 xl:size-5" weight="duotone" />
+              }
+              onClick={handleNewInvoice}
+              size="sm"
+            >
+              New Invoice
+            </Button>
+            <Button
+              icon={
+                <FileTextIcon className="size-4 xl:size-5" weight="duotone" />
+              }
+              onClick={handleNewQuotation}
+              size="sm"
+            >
+              New Quotation
+            </Button>
+          </div>
+        )}
       </section>
 
       {!isLoading && error && (
@@ -202,13 +208,13 @@ function Dashboard() {
       )}
 
       {/* Empty State */}
-      {!isLoading && !error && !hasDocuments && (
-        <section className="flex flex-col items-center justify-center gap-6 border border-dashed border-text/30 bg-foreground/30 py-16">
+      {isEmpty && (
+        <section className="flex flex-col items-center justify-center gap-6 border border-dashed border-text/30 bg-foreground/30 px-6 py-16">
           <div className="flex size-16 items-center justify-center bg-foreground/50">
             <PlusIcon className="size-8 text-muted" weight="duotone" />
           </div>
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-text">Welcome! 👋</h2>
+            <h2 className="text-xl font-semibold text-text">Welcome!</h2>
             <p className="mt-2 text-muted">
               Create your first invoice or quotation to get started.
             </p>

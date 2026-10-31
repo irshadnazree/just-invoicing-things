@@ -4,7 +4,7 @@ import {
   EyeIcon,
   UploadIcon,
 } from "@phosphor-icons/react";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
@@ -28,6 +28,7 @@ function RouteComponent() {
   const router = useRouter();
   const { add } = useToastManager();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasPendingSave = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const {
@@ -51,9 +52,12 @@ function RouteComponent() {
     formData.id &&
     formData.id !== "" &&
     !isQuotationValid(formData) &&
-    (formData.quotationId.trim() !== "" ||
-      formData.projectTitle.trim() !== "" ||
-      formData.items.length > 0)
+    (formData.projectTitle.trim() !== "" ||
+      formData.quotationFrom.company.trim() !== "" ||
+      formData.quotationFor.company.trim() !== "" ||
+      formData.bankAccount.trim() !== "" ||
+      formData.items.length > 0 ||
+      formData.terms.length > 0)
   );
 
   // Setup navigation warning
@@ -67,6 +71,7 @@ function RouteComponent() {
     cancelLabel,
   } = useNavigationWarning({
     enabled: hasUnsavedChanges,
+    allowedPaths: ["/quotation/preview"],
     title: "Unsaved Changes",
     description:
       "You have started filling out this quotation but haven't saved it yet. If you leave now, your progress will be lost.",
@@ -76,10 +81,19 @@ function RouteComponent() {
 
   // Load quotation on component mount
   useEffect(() => {
+    // Persist the previous quotation's last edits before replacing it in the store
+    if (hasPendingSave.current) {
+      hasPendingSave.current = false;
+      saveQuotation();
+    }
     if (quotationId === "new") {
       // Create new quotation
       initializeQuotation();
     } else {
+      // An unsaved draft is only in memory, so keep it rather than reloading from storage
+      if (useQuotationStore.getState().formData.id === quotationId) {
+        return;
+      }
       // Try to load existing quotation
       const loaded = loadQuotation(quotationId);
       if (!loaded) {
@@ -91,29 +105,45 @@ function RouteComponent() {
         });
       }
     }
-  }, [quotationId, loadQuotation, initializeQuotation, router]);
+  }, [quotationId, loadQuotation, initializeQuotation, router, saveQuotation]);
 
   // Auto-save when form data changes with debounce
   useEffect(() => {
-    if (formData.id && formData.id !== "") {
-      setIsSaving(true);
-
-      const timeoutId = setTimeout(() => {
-        const success = saveQuotation();
-        setIsSaving(false);
-
-        // Only show toast on error, success is shown via SaveIndicator
-        if (!success) {
-          add({
-            title: "Failed to save quotation",
-            type: "error",
-          });
-        }
-      }, 1000); // Debounce save by 1 second
-
-      return () => clearTimeout(timeoutId);
+    if (!formData.id || !isQuotationValid(formData)) {
+      setIsSaving(false);
+      return;
     }
+
+    setIsSaving(true);
+    hasPendingSave.current = true;
+
+    const timeoutId = setTimeout(() => {
+      hasPendingSave.current = false;
+      const success = saveQuotation();
+      setIsSaving(false);
+
+      // Only show toast on error, success is shown via SaveIndicator
+      if (!success) {
+        add({
+          title: "Failed to save quotation",
+          type: "error",
+        });
+      }
+    }, 1000); // Debounce save by 1 second
+
+    return () => clearTimeout(timeoutId);
   }, [formData, saveQuotation, add]);
+
+  // Leaving within the debounce window would otherwise drop the last edits
+  useEffect(
+    () => () => {
+      if (hasPendingSave.current) {
+        hasPendingSave.current = false;
+        saveQuotation();
+      }
+    },
+    [saveQuotation]
+  );
 
   const handleExportJSON = () => {
     const exportData = {
@@ -154,36 +184,31 @@ function RouteComponent() {
           <h1 className="text-3xl font-bold">
             {quotationId === "new" ? "Create Quotation" : "Edit Quotation"}
           </h1>
-          <Link to="/quotation">
-            <Button
-              aria-label="Go back"
-              icon={
-                <ArrowUUpLeftIcon
-                  className="size-4 xl:size-5"
-                  size={20}
-                  weight="bold"
-                />
-              }
-              size="sm"
-            />
-          </Link>
+          <Button
+            aria-label="Go back"
+            icon={
+              <ArrowUUpLeftIcon
+                className="size-4 xl:size-5"
+                size={20}
+                weight="bold"
+              />
+            }
+            onClick={() => router.navigate({ to: "/quotation" })}
+            size="sm"
+          />
           <SaveIndicator show={isSaving} />
         </div>
         <div className="flex items-center gap-1 xl:gap-2">
           {formData.id && formData.id !== "" && (
-            <Link to="/quotation/preview">
-              <Button
-                aria-label="Preview"
-                icon={
-                  <EyeIcon
-                    className="size-4 xl:size-5"
-                    size={20}
-                    weight="bold"
-                  />
-                }
-                size="sm"
-              />
-            </Link>
+            <Button
+              icon={
+                <EyeIcon className="size-4 xl:size-5" size={20} weight="bold" />
+              }
+              onClick={() => router.navigate({ to: "/quotation/preview" })}
+              size="sm"
+            >
+              Preview
+            </Button>
           )}
 
           <Button

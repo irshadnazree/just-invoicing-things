@@ -25,11 +25,11 @@ const buttonVariants = cva(
         danger: "bg-error text-white hover:bg-error/90",
       },
       size: {
-        sm: "gap-2 px-3 py-1 font-semibold text-sm",
+        sm: "gap-2 px-3 py-1 font-semibold text-sm max-md:py-2.5 pointer-coarse:py-2.5",
         default: "gap-3 px-4 py-2 text-base text-sm xl:px-7 xl:py-3",
       },
       iconSize: {
-        sm: "size-fit p-1.5",
+        sm: "size-fit p-1.5 max-md:p-3 pointer-coarse:p-3",
         default: "size-fit px-2 xl:p-3",
         none: "",
       },
