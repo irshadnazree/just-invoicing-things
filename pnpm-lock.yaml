@@ -45,8 +45,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       just-things-ui:
-        specifier: file:../just-things-ui/just-things-ui-0.2.0.tgz
-        version: file:../just-things-ui/just-things-ui-0.2.0.tgz(@base-ui/react@1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: github:irshadnazree/just-things-ui#v0.2.0
+        version: git+https://github.com/irshadnazree/just-things-ui.git#71e5951f7d1cbeac4100a4166d49d69d94989927(@base-ui/react@1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -2138,8 +2138,8 @@ packages:
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
-  just-things-ui@file:../just-things-ui/just-things-ui-0.2.0.tgz:
-    resolution: {integrity: sha512-3qb7w+V9HfvgN/K/cmiJp2BxLMccV6CZf0+uC53/QnJpxFBL6qIEA4c4VTgdkwh5ZtBAxDingoCeoMCqRdtNyQ==, tarball: file:../just-things-ui/just-things-ui-0.2.0.tgz}
+  just-things-ui@git+https://github.com/irshadnazree/just-things-ui.git#71e5951f7d1cbeac4100a4166d49d69d94989927:
+    resolution: {commit: 71e5951f7d1cbeac4100a4166d49d69d94989927, repo: https://github.com/irshadnazree/just-things-ui.git, type: git}
     version: 0.2.0
     peerDependencies:
       '@base-ui/react': ^1.3.0
@@ -4598,7 +4598,7 @@ snapshots:
 
   jsonc-parser@3.3.1: {}
 
-  just-things-ui@file:../just-things-ui/just-things-ui-0.2.0.tgz(@base-ui/react@1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  just-things-ui@git+https://github.com/irshadnazree/just-things-ui.git#71e5951f7d1cbeac4100a4166d49d69d94989927(@base-ui/react@1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@base-ui/react': 1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
