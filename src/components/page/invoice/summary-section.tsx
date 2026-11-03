@@ -63,7 +63,7 @@ export default function SummarySection({ onUpdateField }: SummarySectionProps) {
                 {formatCurrency(subtotal, currency)}
               </span>
             </div>
-            <div className="flex justify-between text-primary">
+            <div className="flex justify-between text-primary-text">
               <span>Reductions</span>
               <span className="tabular-nums">
                 ({formatCurrency(reductionAmount, currency)})

@@ -18,7 +18,7 @@ const tabVariants = cva(
   {
     variants: {
       isActive: {
-        true: "text-primary",
+        true: "text-primary-text",
         false: "text-muted hover:text-text",
       },
     },

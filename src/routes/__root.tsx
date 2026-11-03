@@ -6,8 +6,6 @@ import { ThemeProvider } from "@/lib/provider/theme-provider";
 import { AppToastProvider } from "@/lib/provider/toast-provider";
 import { getThemeServerFn } from "@/lib/theme";
 
-import "@fontsource-variable/geist";
-import "@fontsource-variable/geist-mono";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -51,7 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex min-h-screen flex-col items-center">
         <a
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-primary focus:px-4 focus:py-2 focus:text-foreground"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-ink"
           href="#main-content"
         >
           Skip to main content

@@ -99,7 +99,7 @@ function RouteComponent() {
       cellClassName: "whitespace-nowrap font-medium tabular-nums",
       renderCell: (invoice) => (
         <button
-          className="block max-w-full cursor-pointer truncate text-primary transition-opacity hover:opacity-80 tabular-nums"
+          className="block max-w-full cursor-pointer truncate text-primary-text transition-opacity hover:opacity-80 tabular-nums"
           onClick={() => handleOpenInvoice(invoice.id)}
           title={invoice.invoiceId || "No ID"}
           type="button"

@@ -62,7 +62,7 @@ export function StatsCard({
       onKeyDown={handleKeyDown}
       type="button"
     >
-      <span className="text-primary transition-transform duration-200 group-hover:scale-110">
+      <span className="text-primary-text transition-transform duration-200 group-hover:scale-110">
         {icon}
       </span>
       <span className="text-xl font-bold text-text">{count}</span>

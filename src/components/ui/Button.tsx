@@ -20,8 +20,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary text-foreground hover:ring-1 hover:ring-primary/50 dark:bg-foreground dark:text-primary",
-        ghost: "bg-transparent text-primary hover:bg-foreground/50",
+          "bg-primary text-primary-ink hover:ring-1 hover:ring-primary/50 dark:bg-foreground dark:text-primary-text",
+        ghost: "bg-transparent text-primary-text hover:bg-foreground/50",
         danger: "bg-error text-white hover:bg-error/90",
       },
       size: {

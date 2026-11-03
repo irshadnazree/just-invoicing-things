@@ -34,7 +34,7 @@ export function Checkbox({
         id={id}
         onCheckedChange={onChange}
       >
-        <BaseCheckbox.Indicator className="flex items-center justify-center text-foreground">
+        <BaseCheckbox.Indicator className="flex items-center justify-center text-primary-ink">
           <Check className="h-3 w-3" weight="bold" />
         </BaseCheckbox.Indicator>
       </BaseCheckbox.Root>

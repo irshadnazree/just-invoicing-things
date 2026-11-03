@@ -108,7 +108,7 @@ export function DocumentListItem({
   };
 
   const Icon = type === "invoice" ? Receipt : FileText;
-  const iconColor = "text-primary";
+  const iconColor = "text-primary-text";
   const bgColor = "bg-primary/10";
 
   return (
@@ -134,7 +134,7 @@ export function DocumentListItem({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">
-        <span className="tabular-nums font-medium text-sm text-primary">
+        <span className="tabular-nums font-medium text-sm text-primary-text">
           {documentId}
         </span>
         <span className="block truncate text-sm text-text" title={client}>

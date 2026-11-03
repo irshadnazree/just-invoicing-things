@@ -106,7 +106,7 @@ function RouteComponent() {
       cellClassName: "whitespace-nowrap font-medium tabular-nums",
       renderCell: (quotation) => (
         <button
-          className="block max-w-full cursor-pointer truncate text-primary transition-opacity hover:opacity-80 tabular-nums"
+          className="block max-w-full cursor-pointer truncate text-primary-text transition-opacity hover:opacity-80 tabular-nums"
           onClick={() => handleOpenQuotation(quotation.id)}
           title={quotation.quotationId || "No ID"}
           type="button"

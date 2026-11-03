@@ -45,10 +45,10 @@ export function ConfirmationDialog({
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/50 transition-opacity data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-foreground p-6 shadow-xl transition-all data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
           <div className="flex items-start justify-between gap-4">
-            <Dialog.Title className="font-semibold text-lg text-primary">
+            <Dialog.Title className="font-semibold text-lg text-primary-text">
               {title}
             </Dialog.Title>
-            <Dialog.Close className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-primary">
+            <Dialog.Close className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-primary-text">
               <X className="size-5" weight="bold" />
             </Dialog.Close>
           </div>

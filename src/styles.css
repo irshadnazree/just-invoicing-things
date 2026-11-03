@@ -1,5 +1,24 @@
 @import "tailwindcss";
+/* Tokens, fonts, base and components from just-things-ui. In the components layer, so
+   Tailwind utilities always win and the package always beats preflight. */
+@import "just-things-ui/styles.css" layer(components);
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Shared just ___ things accent. White on #00AB98 is 2.9:1, so the ink is dark (5.9:1).
+ * The package's default accent text (92% accent) is 3.4:1 on paper, and a focus ring in the
+ * raw accent is 2.4:1 on the base, so both use a deeper mix in light mode.
+ * data-theme is always set on <html> from the theme cookie, so light-dark() follows it.
+ */
+:root {
+  --jt-accent: #00ab98;
+  --jt-accent-ink: #04201d;
+  --jt-accent-text: light-dark(
+    color-mix(in oklab, var(--jt-accent) 75%, black),
+    color-mix(in oklab, var(--jt-accent) 80%, white)
+  );
+  --jt-focus-color: var(--jt-accent-text);
+}
 /* Design Tokens (OKLCH Color Space) */
 @layer base {
   :root {
@@ -8,7 +27,7 @@
     --background: oklch(1 0 0);
     --foreground: oklch(0.9702 0 0);
     --text: oklch(0.235 0 0);
-    --primary: oklch(0.52 0.09 190);
+    --primary: var(--jt-accent);
     --error: oklch(0.65 0.15 20);
     --success: oklch(0.72 0.17 155);
     --warning: oklch(0.8 0.15 85);
@@ -22,7 +41,7 @@
     --background: oklch(0.1776 0 0);
     --foreground: oklch(0.235 0 0);
     --text: oklch(0.9702 0 0 / 0.8);
-    --primary: oklch(0.75 0.1 190);
+    --primary: var(--jt-accent);
     --error: oklch(0.65 0.15 20);
     --success: oklch(0.68 0.15 155);
     --warning: oklch(0.75 0.13 85);
@@ -36,6 +55,9 @@
     --color-foreground: var(--foreground);
     --color-text: var(--text);
     --color-primary: var(--primary);
+    /* Accent as text on the page, and text on an accent fill (both pass 4.5:1) */
+    --color-primary-text: var(--jt-accent-text);
+    --color-primary-ink: var(--jt-accent-ink);
     --color-error: var(--error);
     --color-success: var(--success);
     --color-warning: var(--warning);
@@ -44,8 +66,8 @@
     --color-input: var(--text);
     --color-border: var(--text);
     --color-card: var(--background);
-    --font-sans: "Geist Variable", sans-serif;
-    --font-mono: "Geist Mono Variable", monospace;
+    --font-sans: var(--jt-font-sans);
+    --font-mono: var(--jt-font-mono);
   }
 }
 
