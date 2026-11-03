@@ -19,6 +19,22 @@
   );
   --jt-focus-color: var(--jt-accent-text);
 }
+
+/* Phones: the header's three tabs don't fit beside the wordmark, so they take a second row. */
+@media (max-width: 720px) {
+  .app-header {
+    flex-wrap: wrap;
+    row-gap: 0;
+    height: auto;
+    padding-top: var(--jt-space-2);
+  }
+  .app-header .jt-app-header__nav {
+    order: 1;
+    flex-basis: 100%;
+    height: 40px;
+    margin-left: 0;
+  }
+}
 /* Design Tokens (OKLCH Color Space) */
 @layer base {
   :root {

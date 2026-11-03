@@ -22,6 +22,7 @@ export default function ThemeToggle() {
       }
       onClick={toggleTheme}
       size="sm"
+      variant="ghost"
     />
   );
 }
