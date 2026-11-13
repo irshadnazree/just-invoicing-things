@@ -1,2 +1,12 @@
 minimumReleaseAgeExclude:
   - "@irshadnazree/*"
+
+# Dependency build scripts (pnpm denies unlisted ones and fails the install).
+# esbuild, workerd and sharp ship prebuilt binaries as optional platform
+# packages; their scripts only verify or relink those binaries, so they stay off.
+# simple-git-hooks' postinstall writes the pre-commit hook, so it is allowed.
+allowBuilds:
+  esbuild: false
+  sharp: false
+  simple-git-hooks: true
+  workerd: false
