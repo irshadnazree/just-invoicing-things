@@ -1,7 +1,7 @@
 @import "tailwindcss";
 /* Tokens, fonts, base and components from just-things-ui. In the components layer, so
    Tailwind utilities always win and the package always beats preflight. */
-@import "just-things-ui/styles.css" layer(components);
+@import "@irshadnazree/just-things-ui/styles.css" layer(components);
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*

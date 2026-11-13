@@ -1,5 +1,5 @@
+import { AppHeader } from "@irshadnazree/just-things-ui";
 import { Link, useLocation } from "@tanstack/react-router";
-import { AppHeader } from "just-things-ui";
 
 import ThemeToggle from "@/components/shared/theme-toggle";
 
