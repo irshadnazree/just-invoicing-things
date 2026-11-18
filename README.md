@@ -29,12 +29,12 @@ A modern, full-featured quotation generator built with TanStack Start, React, an
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- pnpm (v10.15.0 or higher)
+- Bun (v1.4.2 or higher)
 
 ### Installation
 
 ```bash
-pnpm install
+bun install
 ```
 
 ### Development
@@ -42,7 +42,7 @@ pnpm install
 Start the development server:
 
 ```bash
-pnpm dev
+bun run dev
 ```
 
 The application will be available at `http://localhost:3773`
@@ -52,13 +52,13 @@ The application will be available at `http://localhost:3773`
 Build the application:
 
 ```bash
-pnpm build
+bun run build
 ```
 
 Preview the production build:
 
 ```bash
-pnpm preview
+bun run preview
 ```
 
 ### Deployment
@@ -66,7 +66,7 @@ pnpm preview
 Deploy to Cloudflare Workers:
 
 ```bash
-pnpm deploy
+bun run deploy
 ```
 
 ## Project Structure
@@ -135,7 +135,7 @@ src/
 Run tests:
 
 ```bash
-pnpm test
+bun run test
 ```
 
 ### Code Quality
@@ -147,7 +147,7 @@ This project uses Biome for linting and formatting. The configuration is in `bio
 Generate Cloudflare Workers types:
 
 ```bash
-pnpm cf-typegen
+bun run cf-typegen
 ```
 
 ## License
