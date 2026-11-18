@@ -3,3 +3,7 @@
 # Our own UI package is exempt so new releases can be picked up immediately.
 minimumReleaseAge = 86400
 minimumReleaseAgeExcludes = ["@irshadnazree/just-things-ui"]
+
+[test]
+# Register a DOM (happy-dom) and Testing Library cleanup before every test file.
+preload = ["./test/setup.ts"]
