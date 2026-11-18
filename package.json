@@ -61,5 +61,6 @@
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm run check"
-  }
+  },
+  "packageManager": "pnpm@12.14.0"
 }
