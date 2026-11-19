@@ -1,7 +1,5 @@
-import { cva } from "class-variance-authority";
+import { Skeleton, Surface } from "@irshadnazree/just-things-ui";
 import type { ReactNode } from "react";
-
-import { cn } from "@/lib/utils";
 
 export type StatsCardProps = {
   count: number;
@@ -10,21 +8,6 @@ export type StatsCardProps = {
   label: string;
   onClick?: () => void;
 };
-
-const cardVariants = cva(
-  "group flex cursor-pointer items-center justify-start gap-2 border border-text/30 bg-foreground/50 p-6 transition-all duration-200 hover:border-primary hover:bg-foreground hover:shadow-sm",
-  {
-    variants: {
-      isLoading: {
-        true: "animate-pulse cursor-default hover:border-text/30 hover:bg-foreground/50 hover:shadow-none",
-        false: "",
-      },
-    },
-    defaultVariants: {
-      isLoading: false,
-    },
-  }
-);
 
 export function StatsCard({
   count,
@@ -35,38 +18,26 @@ export function StatsCard({
 }: StatsCardProps) {
   if (isLoading) {
     return (
-      <div className={cn(cardVariants({ isLoading: true }))}>
-        <div className="size-10 bg-text/10" />
-        <div className="h-8 w-16 bg-text/10" />
-        <div className="h-4 w-24 bg-text/10" />
-      </div>
+      <Surface className="flex items-center gap-3" padding="lg">
+        <Skeleton className="size-6" />
+        <Skeleton className="h-6 w-28" />
+      </Surface>
     );
   }
 
-  const handleClick = () => {
-    onClick?.();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onClick?.();
-    }
-  };
-
   return (
-    <button
-      aria-label={`${label}: ${count} items. Click to view all ${label.toLowerCase()}.`}
-      className={cn(cardVariants({ isLoading: false }))}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      type="button"
+    <Surface
+      className="flex items-center gap-3"
+      interactive
+      onClick={onClick}
+      padding="lg"
+      render={<button type="button" />}
     >
-      <span className="text-primary-text transition-transform duration-200 group-hover:scale-110">
+      <span aria-hidden="true" className="text-accent-text">
         {icon}
       </span>
-      <span className="text-xl font-bold text-text">{count}</span>
-      <span className="text-xl font-medium text-muted">{label}</span>
-    </button>
+      <span className="jt-num font-semibold text-xl">{count}</span>
+      <span className="jt-muted text-xl">{label}</span>
+    </Surface>
   );
 }

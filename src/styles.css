@@ -2,13 +2,26 @@
 /* Tokens, fonts, base and components from just-things-ui. In the components layer, so
    Tailwind utilities always win and the package always beats preflight. */
 @import "@irshadnazree/just-things-ui/styles.css" layer(components);
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* `dark:` follows data-theme and falls back to the system setting, like the tokens do. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(
+      :root:not([data-theme="light"]),
+      :root:not([data-theme="light"]) *
+    ) {
+      @slot;
+    }
+  }
+}
 
 /*
  * Shared just ___ things accent. White on #00AB98 is 2.9:1, so the ink is dark (5.9:1).
  * The package's default accent text (92% accent) is 3.4:1 on paper, and a focus ring in the
  * raw accent is 2.4:1 on the base, so both use a deeper mix in light mode.
- * data-theme is always set on <html> from the theme cookie, so light-dark() follows it.
+ * light-dark() follows color-scheme, so it works for System as well as a forced theme.
  */
 :root {
   --jt-accent: #00ab98;
@@ -35,92 +48,29 @@
     margin-left: 0;
   }
 }
-/* Design Tokens (OKLCH Color Space) */
-@layer base {
-  :root {
-    color-scheme: light;
-    /* Light theme */
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.9702 0 0);
-    --text: oklch(0.235 0 0);
-    --primary: var(--jt-accent);
-    --error: oklch(0.65 0.15 20);
-    --success: oklch(0.72 0.17 155);
-    --warning: oklch(0.8 0.15 85);
-    --muted: oklch(0.55 0 0);
-    --muted-foreground: oklch(0.45 0 0);
-  }
-
-  [data-theme="dark"] {
-    color-scheme: dark;
-    /* Dark theme */
-    --background: oklch(0.1776 0 0);
-    --foreground: oklch(0.235 0 0);
-    --text: oklch(0.9702 0 0 / 0.8);
-    --primary: var(--jt-accent);
-    --error: oklch(0.65 0.15 20);
-    --success: oklch(0.68 0.15 155);
-    --warning: oklch(0.75 0.13 85);
-    --muted: oklch(0.6 0 0);
-    --muted-foreground: oklch(0.68 0 0);
-  }
-
-  /* Tailwind Theme Mappings */
-  @theme {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-text: var(--text);
-    --color-primary: var(--primary);
-    /* Accent as text on the page, and text on an accent fill (both pass 4.5:1) */
-    --color-primary-text: var(--jt-accent-text);
-    --color-primary-ink: var(--jt-accent-ink);
-    --color-error: var(--error);
-    --color-success: var(--success);
-    --color-warning: var(--warning);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-input: var(--text);
-    --color-border: var(--text);
-    --color-card: var(--background);
-    --font-sans: var(--jt-font-sans);
-    --font-mono: var(--jt-font-mono);
-  }
-}
-
-/* Base element styles */
-body {
-  @apply m-0 tracking-tight;
-  font-family: var(--font-sans);
-  color: var(--text);
-  background-color: var(--background);
-
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-/* Hide number input spinners */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-.h-scrollbar::-webkit-scrollbar {
-  scrollbar-width: thin;
-  height: 4px;
-}
-
-.h-scrollbar::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-.h-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--primary);
+/*
+ * The package tokens as Tailwind utilities (bg-paper, text-ink-muted, border-line,
+ * rounded-control…). Colours come only from --jt-* so every screen matches the other
+ * just ___ things apps; Tailwind is only for arrangement.
+ */
+@theme inline {
+  --color-ink: var(--jt-ink);
+  --color-ink-muted: var(--jt-ink-muted);
+  --color-paper: var(--jt-paper);
+  --color-paper-2: var(--jt-paper-2);
+  --color-base: var(--jt-base);
+  --color-line: var(--jt-line);
+  --color-line-strong: var(--jt-line-strong);
+  --color-accent: var(--jt-accent);
+  --color-accent-text: var(--jt-accent-text);
+  --color-accent-soft: var(--jt-accent-soft);
+  --color-good: var(--jt-good);
+  --color-bad: var(--jt-bad);
+  --font-sans: var(--jt-font-sans);
+  --font-mono: var(--jt-font-mono);
+  --radius-control: var(--jt-radius-control);
+  --radius-surface: var(--jt-radius-surface);
+  --radius-float: var(--jt-radius-float);
 }
 
 @media print {
@@ -202,17 +152,8 @@ input[type="number"] {
     display: none !important;
   }
 
-  .bg-muted,
-  .bg-card,
-  .bg-gray-50,
   .bg-white {
     background: white !important;
-  }
-
-  .bg-yellow-400 {
-    background-color: #facc15 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
 
   .p-6 {

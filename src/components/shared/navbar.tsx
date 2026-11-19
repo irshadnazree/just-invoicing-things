@@ -1,7 +1,5 @@
-import { AppHeader } from "@irshadnazree/just-things-ui";
+import { AppHeader, ThemeToggle } from "@irshadnazree/just-things-ui";
 import { Link, useLocation } from "@tanstack/react-router";
-
-import ThemeToggle from "@/components/shared/theme-toggle";
 
 const links = [
   { to: "/", label: "Dashboard" },

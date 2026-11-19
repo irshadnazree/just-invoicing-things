@@ -1,7 +1,8 @@
+import { Field, Input } from "@irshadnazree/just-things-ui";
 import { memo } from "react";
 
-import { FormField, FormLabel } from "@/components/ui/Form";
-import { Input } from "@/components/ui/Input";
+import { SectionHeading } from "@/components/shared/page-header";
+import { openDatePicker } from "@/lib/date-input";
 import { useInvoiceData } from "@/stores/invoice-store";
 
 type ProjectDetailsSectionProps = {
@@ -19,77 +20,54 @@ function ProjectDetailsSectionComponent({
 
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <h3 className="border-text border-b-2 pb-2 font-semibold text-lg">
-          Invoice Details
-        </h3>
-        <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
-          <FormField>
-            <FormLabel id="invoice-id" label="Invoice No #" />
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Invoice details</SectionHeading>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <Field label="Invoice no.">
             <Input
-              id="invoice-id"
-              onChange={(value) => onUpdateField("invoiceId", value as string)}
-              type="text"
+              inputClassName="jt-mono"
+              onValueChange={(value) => onUpdateField("invoiceId", value)}
               value={invoiceId}
             />
-          </FormField>
-          <FormField>
-            <FormLabel id="invoice-date" label="Invoice Date" />
+          </Field>
+          <Field label="Invoice date">
             <Input
-              id="invoice-date"
-              onChange={(value) =>
-                onUpdateField("invoiceDate", value as string)
-              }
+              onClick={openDatePicker}
+              onValueChange={(value) => onUpdateField("invoiceDate", value)}
               type="date"
               value={invoiceDate}
             />
-          </FormField>
-          <FormField className="col-span-1 xl:col-span-2">
-            <FormLabel id="bank-account" label="Bank Account Number" />
+          </Field>
+          <Field className="xl:col-span-2" label="Bank account number">
             <Input
-              id="bank-account"
-              onChange={(value) =>
-                onUpdateField("bankAccount", value as string)
-              }
-              type="text"
+              inputClassName="jt-mono"
+              onValueChange={(value) => onUpdateField("bankAccount", value)}
               value={bankAccount}
             />
-          </FormField>
+          </Field>
         </div>
-      </div>
-      <div className="flex flex-col gap-3">
-        <h3 className="border-text border-b-2 pb-2 font-semibold text-lg">
-          Billed Information
-        </h3>
-        <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
-          <div className="flex flex-col gap-2">
-            <FormField>
-              <FormLabel id="invoice-from-company" label="Billed By" />
-              <Input
-                id="invoice-from-company"
-                onChange={(value) =>
-                  onUpdateNestedField("invoiceFrom", "company", value as string)
-                }
-                type="text"
-                value={invoiceFrom.company}
-              />
-            </FormField>
-          </div>
-          <div className="flex flex-col gap-2">
-            <FormField>
-              <FormLabel id="invoice-to-company" label="Billed To" />
-              <Input
-                id="invoice-to-company"
-                onChange={(value) =>
-                  onUpdateNestedField("invoiceTo", "company", value as string)
-                }
-                type="text"
-                value={invoiceTo.company}
-              />
-            </FormField>
-          </div>
+      </section>
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Billing</SectionHeading>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <Field label="Billed by">
+            <Input
+              onValueChange={(value) =>
+                onUpdateNestedField("invoiceFrom", "company", value)
+              }
+              value={invoiceFrom.company}
+            />
+          </Field>
+          <Field label="Billed to">
+            <Input
+              onValueChange={(value) =>
+                onUpdateNestedField("invoiceTo", "company", value)
+              }
+              value={invoiceTo.company}
+            />
+          </Field>
         </div>
-      </div>
+      </section>
     </>
   );
 }

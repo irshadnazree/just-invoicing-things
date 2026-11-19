@@ -1,7 +1,11 @@
-import { Card } from "@/components/ui/Card";
-import { FormField, FormLabel } from "@/components/ui/Form";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import {
+  Field,
+  NumberField,
+  Select,
+  Surface,
+} from "@irshadnazree/just-things-ui";
+
+import { SectionHeading } from "@/components/shared/page-header";
 import { formatCurrency } from "@/lib/utils";
 import {
   useInvoiceCurrency,
@@ -13,6 +17,9 @@ import { numberToWords } from "@/utils/format";
 type SummarySectionProps = {
   onUpdateField: (field: string, value: unknown) => void;
 };
+
+// Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
+const MONEY_FORMAT = { minimumFractionDigits: 2, maximumFractionDigits: 20 };
 
 export default function SummarySection({ onUpdateField }: SummarySectionProps) {
   const currency = useInvoiceCurrency();
@@ -26,65 +33,56 @@ export default function SummarySection({ onUpdateField }: SummarySectionProps) {
   const total = subtotal - reductionAmount;
 
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className="border-text border-b-2 pb-2 font-semibold text-lg">
-        Summary
-      </h3>
+    <section className="flex flex-col gap-4">
+      <SectionHeading>Summary</SectionHeading>
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <FormField>
-          <FormLabel id="currency" label="Currency" />
+        <Field label="Currency">
           <Select
-            id="currency"
-            onChange={(value) => onUpdateField("currency", value as string)}
-            options={[
-              { value: "RM", label: "MYR" },
-              { value: "USD", label: "USD" },
-            ]}
+            onChange={(event) => onUpdateField("currency", event.target.value)}
             value={currency}
-          />
-        </FormField>
-        <FormField>
-          <FormLabel id="reduction-amount" label="Reductions" />
-          <Input
-            id="reduction-amount"
-            onChange={(value) =>
-              onUpdateField("reductionAmount", Number(value))
+          >
+            <option value="RM">MYR</option>
+            <option value="USD">USD</option>
+          </Select>
+        </Field>
+        <Field label="Reductions">
+          <NumberField
+            format={MONEY_FORMAT}
+            onValueChange={(value) =>
+              onUpdateField("reductionAmount", value ?? 0)
             }
-            type="number"
             value={reductionAmount}
           />
-        </FormField>
+        </Field>
 
-        <div className="flex flex-col gap-4 xl:col-span-2">
-          <Card className="flex flex-col gap-1">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span className="tabular-nums">
-                {formatCurrency(subtotal, currency)}
-              </span>
-            </div>
-            <div className="flex justify-between text-primary-text">
-              <span>Reductions</span>
-              <span className="tabular-nums">
-                ({formatCurrency(reductionAmount, currency)})
-              </span>
-            </div>
-            <div className="flex justify-between border-t pt-2 font-bold text-xl">
-              <span>Total ({currency})</span>
-              <span className="tabular-nums">
-                {formatCurrency(total, currency)}
-              </span>
-            </div>
-            <div className="flex justify-between text-xl">
-              <div className="mb-1 font-semibold">Total (in words):</div>
-              <div className="text-lg capitalize">
-                {numberToWords(total)}{" "}
-                {currency === "RM" ? "Ringgit Only" : "Dollars Only"}
-              </div>
-            </div>
-          </Card>
-        </div>
+        <Surface className="flex flex-col gap-2 xl:col-span-2">
+          <div className="flex justify-between gap-4">
+            <span className="jt-muted">Subtotal</span>
+            <span className="jt-mono jt-num">
+              {formatCurrency(subtotal, currency)}
+            </span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span className="jt-muted">Reductions</span>
+            <span className="jt-mono jt-num text-accent-text">
+              ({formatCurrency(reductionAmount, currency)})
+            </span>
+          </div>
+          <div className="flex justify-between gap-4 border-line border-t pt-2 font-semibold text-lg">
+            <span>Total ({currency})</span>
+            <span className="jt-mono jt-num">
+              {formatCurrency(total, currency)}
+            </span>
+          </div>
+          <div className="flex flex-wrap justify-between gap-x-4 gap-y-1">
+            <span className="jt-muted">Total in words</span>
+            <span className="capitalize">
+              {numberToWords(total)}{" "}
+              {currency === "RM" ? "Ringgit Only" : "Dollars Only"}
+            </span>
+          </div>
+        </Surface>
       </div>
-    </div>
+    </section>
   );
 }

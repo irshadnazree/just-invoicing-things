@@ -1,7 +1,8 @@
-import { FileText, Receipt } from "@phosphor-icons/react";
+import { Skeleton, Surface, Tag } from "@irshadnazree/just-things-ui";
+import { FileTextIcon, ReceiptIcon } from "@phosphor-icons/react";
 import { useNavigate } from "@tanstack/react-router";
 
-import { cn, formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 type DocumentType = "invoice" | "quotation";
 
@@ -57,15 +58,15 @@ function formatRelativeTime(dateString: string): string {
 
 export function DocumentListItemSkeleton() {
   return (
-    <div className="flex animate-pulse items-center gap-4 border border-text/20 bg-foreground/30 p-4">
-      <div className="size-10 bg-text/10" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 w-24 bg-text/10" />
-        <div className="h-3 w-32 bg-text/10" />
+    <Surface className="flex items-center gap-4">
+      <Skeleton className="size-9" />
+      <div className="flex flex-1 flex-col gap-2">
+        <Skeleton className="h-3.5 w-24" />
+        <Skeleton className="h-3 w-40" />
       </div>
-      <div className="h-4 w-20 bg-text/10" />
-      <div className="h-4 w-24 bg-text/10" />
-    </div>
+      <Skeleton className="h-3.5 w-20" />
+      <Skeleton className="h-3 w-16" />
+    </Surface>
   );
 }
 
@@ -100,55 +101,47 @@ export function DocumentListItem({
     });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleClick();
-    }
-  };
-
-  const Icon = type === "invoice" ? Receipt : FileText;
-  const iconColor = "text-primary-text";
-  const bgColor = "bg-primary/10";
+  const Icon = type === "invoice" ? ReceiptIcon : FileTextIcon;
+  const typeLabel = type === "invoice" ? "Invoice" : "Quotation";
+  const updated = formatRelativeTime(updatedAt);
 
   return (
-    <button
-      aria-label={`${type === "invoice" ? "Invoice" : "Quotation"} ${documentId} for ${client}, ${formatCurrency(total, currency)}, updated ${formatRelativeTime(updatedAt)}. Click to open.`}
-      className={cn(
-        "flex w-full items-center gap-4 border border-text/20 bg-foreground/50 p-4",
-        "transition-all duration-200",
-        "hover:border-primary hover:bg-foreground hover:shadow-sm",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-      )}
+    <Surface
+      aria-label={`${typeLabel} ${documentId} for ${client}, ${formatCurrency(total, currency)}, updated ${updated}`}
+      className="flex items-center gap-4"
+      interactive
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      type="button"
+      render={<button type="button" />}
     >
-      <div
-        className={cn(
-          "flex size-10 shrink-0 items-center justify-center",
-          bgColor
-        )}
+      <span
+        aria-hidden="true"
+        className="flex size-9 shrink-0 items-center justify-center rounded-control bg-accent-soft text-accent-text"
       >
-        <Icon className={cn("size-5", iconColor)} weight="duotone" />
-      </div>
+        <Icon size={18} weight="duotone" />
+      </span>
 
-      <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">
-        <span className="tabular-nums font-medium text-sm text-primary-text">
-          {documentId}
+      <span className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="jt-mono whitespace-nowrap font-medium text-sm">
+            {documentId}
+          </span>
+          <Tag>{typeLabel}</Tag>
         </span>
-        <span className="block truncate text-sm text-text" title={client}>
+        <span
+          className="jt-muted block max-w-full truncate text-sm"
+          title={client}
+        >
           {client}
         </span>
-      </div>
+      </span>
 
-      <div className="hidden shrink-0 tabular-nums font-medium text-sm text-text sm:block">
+      <span className="jt-mono jt-num hidden shrink-0 text-sm sm:block">
         {formatCurrency(total, currency)}
-      </div>
+      </span>
 
-      <div className="shrink-0 text-xs text-muted">
-        {formatRelativeTime(updatedAt)}
-      </div>
-    </button>
+      <span className="jt-muted w-20 shrink-0 text-right text-xs">
+        {updated}
+      </span>
+    </Surface>
   );
 }

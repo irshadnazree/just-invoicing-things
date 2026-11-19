@@ -1,4 +1,10 @@
-import { FileText, TrashIcon } from "@phosphor-icons/react";
+import {
+  Button,
+  ConfirmDialog,
+  Input,
+  Spinner,
+} from "@irshadnazree/just-things-ui";
+import { FileTextIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
@@ -7,10 +13,7 @@ import NoResultSection from "@/components/shared/history/no-result-view";
 import TableView, {
   type TableColumn,
 } from "@/components/shared/history/table-view";
-import { Button } from "@/components/ui/Button";
-import { ConfirmationDialog } from "@/components/ui/Dialog";
-import { Input } from "@/components/ui/Input";
-import { Loader } from "@/components/ui/Loader";
+import { PageHeader } from "@/components/shared/page-header";
 import { calculateQuotationTotal, formatCurrency } from "@/lib/utils";
 import { useQuotationStore } from "@/stores/quotation-store";
 import type { QuotationFormData, QuotationListItem } from "@/types/quotation";
@@ -101,24 +104,23 @@ function RouteComponent() {
   const columns: TableColumn<QuotationListItem>[] = [
     {
       key: "quotationId",
-      label: "Id",
-      width: "w-[12%]",
-      cellClassName: "whitespace-nowrap font-medium tabular-nums",
+      label: "No.",
+      width: "w-36",
+      cellClassName: "whitespace-nowrap",
       renderCell: (quotation) => (
-        <button
-          className="block max-w-full cursor-pointer truncate text-primary-text transition-opacity hover:opacity-80 tabular-nums"
+        <Button
+          className="jt-mono max-w-full justify-start"
           onClick={() => handleOpenQuotation(quotation.id)}
           title={quotation.quotationId || "No ID"}
-          type="button"
+          variant="link"
         >
-          {quotation.quotationId || "No ID"}
-        </button>
+          <span className="truncate">{quotation.quotationId || "No ID"}</span>
+        </Button>
       ),
     },
     {
       key: "projectTitle",
       label: "Project",
-      width: "w-[32%]",
       cellClassName: "min-w-0",
       renderCell: (quotation) => (
         <span className="block truncate" title={quotation.projectTitle}>
@@ -128,15 +130,14 @@ function RouteComponent() {
     },
     {
       key: "paymentType",
-      label: "Payment Type",
-      width: "w-[12%]",
+      label: "Payment",
+      width: "w-28",
       cellClassName: "whitespace-nowrap",
       renderCell: (quotation) => quotation.paymentType,
     },
     {
       key: "quotationFor",
       label: "Client",
-      width: "w-[18%]",
       cellClassName: "min-w-0",
       renderCell: (quotation) => (
         <span className="block truncate" title={quotation.quotationFor}>
@@ -147,12 +148,19 @@ function RouteComponent() {
     {
       key: "total",
       label: "Total",
-      width: "w-[10%]",
-      cellClassName: "whitespace-nowrap tabular-nums",
+      width: "w-40",
+      cellClassName: "jt-mono whitespace-nowrap",
+      numeric: true,
       renderCell: (quotation) =>
         formatCurrency(quotation.total, quotation.currency),
     },
   ];
+
+  // A selection can't outlive the search that showed it, or bulk delete could hit hidden rows
+  function handleSearch(value: string) {
+    setSearchTerm(value);
+    setSelectedQuotations(new Set());
+  }
 
   function cancelDelete() {
     setPendingDeleteId(null);
@@ -203,7 +211,7 @@ function RouteComponent() {
     return (
       <section className="flex flex-col gap-6">
         <div className="flex min-h-96 items-center justify-center">
-          <Loader text="Loading quotations..." />
+          <Spinner label="Loading quotations" size="lg" />
         </div>
       </section>
     );
@@ -211,75 +219,64 @@ function RouteComponent() {
 
   return (
     <section className="flex flex-col gap-6">
-      <ConfirmationDialog
+      <ConfirmDialog
         confirmLabel="Delete"
-        description="Are you sure you want to delete this quotation?"
-        onCancel={cancelDelete}
+        description="This can't be undone."
         onConfirm={confirmDelete}
-        open={pendingDeleteId !== null}
-        title="Confirm Delete"
-        variant="warning"
         onOpenChange={(open) => {
           if (!open) {
             cancelDelete();
           }
         }}
+        open={pendingDeleteId !== null}
+        title="Delete this quotation?"
+        tone="danger"
       />
 
-      <ConfirmationDialog
-        confirmLabel={`Delete ${selectedQuotations.size} Item(s)`}
-        description={`Are you sure you want to delete ${selectedQuotations.size} quotation(s)?`}
-        onCancel={cancelBulkDelete}
+      <ConfirmDialog
+        confirmLabel={`Delete ${selectedQuotations.size}`}
+        description="This can't be undone."
         onConfirm={confirmBulkDelete}
-        open={pendingBulkDelete}
-        title="Confirm Bulk Delete"
-        variant="warning"
         onOpenChange={(open) => {
           if (!open) {
             cancelBulkDelete();
           }
         }}
+        open={pendingBulkDelete}
+        title={`Delete ${selectedQuotations.size} ${selectedQuotations.size === 1 ? "quotation" : "quotations"}?`}
+        tone="danger"
       />
 
-      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center md:gap-0">
-        <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold">Quotations</h1>
-          {quotations.length > 0 && (
-            <Button
-              icon={<FileText className="size-4 xl:size-5" weight="duotone" />}
-              onClick={handleCreateQuotation}
-              size="sm"
-            >
-              New Quotation
-            </Button>
-          )}
-        </div>
-        <div className="flex w-full items-center gap-4 md:w-auto">
-          {selectedQuotations.size > 0 && (
-            <Button
-              aria-label="Delete selected"
-              icon={<TrashIcon className="size-4 xl:size-5" size={20} />}
-              onClick={handleBulkDelete}
-              size="sm"
-              variant="ghost"
+      <PageHeader
+        actions={
+          <>
+            {selectedQuotations.size > 0 && (
+              <Button onClick={handleBulkDelete} variant="danger">
+                <TrashIcon size={16} />
+                Delete {selectedQuotations.size}
+              </Button>
+            )}
+            <Input
+              aria-label="Search quotations"
+              className="min-w-0 flex-1 sm:w-64 sm:flex-none"
+              onValueChange={handleSearch}
+              placeholder="Search quotations"
+              type="search"
+              value={searchTerm}
             />
-          )}
-
-          <label className="sr-only" htmlFor="search">
-            Search quotations
-          </label>
-          <Input
-            id="search"
-            onChange={(value) => setSearchTerm(value as string)}
-            placeholder="Search quotations..."
-            type="text"
-            value={searchTerm}
-          />
-        </div>
-      </div>
+            {quotations.length > 0 && (
+              <Button onClick={handleCreateQuotation} variant="primary">
+                <FileTextIcon size={16} weight="bold" />
+                New quotation
+              </Button>
+            )}
+          </>
+        }
+        title="Quotations"
+      />
 
       {sortedQuotations.length === 0 && searchTerm !== "" && (
-        <NoResultSection setSearchTerm={setSearchTerm} title="quotations" />
+        <NoResultSection setSearchTerm={handleSearch} title="quotations" />
       )}
       {quotations.length === 0 && searchTerm === "" && (
         <EmptyListView
@@ -292,6 +289,7 @@ function RouteComponent() {
         <TableView
           columns={columns}
           duplicateItem={duplicateQuotation}
+          minWidthClassName="min-w-240"
           getItemLabel={(item) => item.quotationId || item.id}
           items={sortedQuotations}
           loadItems={getAllQuotationsAsync}
@@ -304,10 +302,10 @@ function RouteComponent() {
       )}
 
       {sortedQuotations.length > 0 && (
-        <div className="mt-4 text-sm text-text">
+        <p className="jt-muted text-sm">
           Showing {sortedQuotations.length} of {formattedQuotations.length}{" "}
           quotations
-        </div>
+        </p>
       )}
     </section>
   );

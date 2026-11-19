@@ -1,8 +1,9 @@
+import { Button, EmptyState, Surface } from "@irshadnazree/just-things-ui";
 import { ArrowUUpLeftIcon, PrinterIcon } from "@phosphor-icons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { DocumentPrintStyles } from "@/components/shared/document-print-styles";
-import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/shared/page-header";
 import { formatDecimal, generatePrintFilename } from "@/lib/utils";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { numberToWords } from "@/utils/format";
@@ -51,51 +52,41 @@ function RouteComponent() {
 
   return (
     <section className="document-preview-page flex flex-col gap-5">
-      <div className="flex flex-col items-start justify-between gap-4 xl:flex-row xl:items-center xl:gap-0 print:hidden">
-        <h1 className="font-bold text-3xl">Invoice Preview</h1>
-        <div className="flex items-center gap-2">
-          <Button
-            aria-label="Go back"
-            icon={
-              <ArrowUUpLeftIcon
-                className="size-4 xl:size-5"
-                size={20}
-                weight="bold"
-              />
-            }
-            onClick={goBack}
-            size="sm"
-          />
-          {hasDocument && (
-            <Button
-              icon={
-                <PrinterIcon
-                  className="size-4 xl:size-5"
-                  size={20}
-                  weight="bold"
-                />
-              }
-              onClick={printInvoice}
-              size="sm"
-            >
+      <PageHeader
+        actions={
+          hasDocument && (
+            <Button onClick={printInvoice} variant="primary">
+              <PrinterIcon size={16} weight="bold" />
               Print / PDF
             </Button>
-          )}
-        </div>
-      </div>
+          )
+        }
+        className="print:hidden"
+        leading={
+          <Button
+            aria-label="Back to the editor"
+            iconOnly
+            onClick={goBack}
+            variant="ghost"
+          >
+            <ArrowUUpLeftIcon size={16} weight="bold" />
+          </Button>
+        }
+        title="Invoice preview"
+      />
 
       {!hasDocument && (
-        <section className="flex flex-col items-center justify-center gap-4 border border-dashed border-text/30 bg-foreground/30 px-6 py-16 text-center">
-          <h2 className="font-semibold text-text text-xl">
-            Nothing to preview yet
-          </h2>
-          <p className="text-text/80">
-            Open an invoice from the list, or create a new one to see it here.
-          </p>
-          <Button onClick={goBack} size="sm">
-            Create Invoice
-          </Button>
-        </section>
+        <Surface variant="dashed">
+          <EmptyState
+            actions={
+              <Button onClick={goBack} variant="primary">
+                Create invoice
+              </Button>
+            }
+            description="Open an invoice from the list, or create a new one to see it here."
+            title="Nothing to preview yet"
+          />
+        </Surface>
       )}
 
       {hasDocument && (

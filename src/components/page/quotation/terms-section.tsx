@@ -1,8 +1,7 @@
+import { Button, Surface, Textarea } from "@irshadnazree/just-things-ui";
 import { CopyIcon, PlusIcon, TrashIcon } from "@phosphor-icons/react";
 
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Textarea } from "@/components/ui/Textarea";
+import { SectionHeading } from "@/components/shared/page-header";
 import {
   useAddTerm,
   useDuplicateTerm,
@@ -10,7 +9,6 @@ import {
   useRemoveTerm,
   useUpdateTerm,
 } from "@/stores/quotation-store";
-import type { QuotationStore } from "@/types/quotation";
 
 export default function TermsSection() {
   const terms = useQuotationTerms();
@@ -19,83 +17,73 @@ export default function TermsSection() {
   const removeTerm = useRemoveTerm();
   const updateTerm = useUpdateTerm();
 
-  function handleAddTerm() {
-    addTerm();
-  }
-
-  function handleDuplicateTerm(index: number) {
-    duplicateTerm(index);
-  }
-
-  function handleRemoveTerm(index: number) {
-    removeTerm(index);
-  }
-
-  const handleUpdateTerm: QuotationStore["updateTerm"] = (index, value) =>
-    updateTerm(index, value);
-
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between border-b-2 pb-1">
-        <h3 className="border-text font-semibold text-lg">
-          Terms and Conditions Details
-        </h3>
-        {terms.length > 0 && (
-          <Button
-            icon={<PlusIcon size={22} weight="bold" />}
-            onClick={handleAddTerm}
-            size="sm"
-            variant="ghost"
-          >
-            Add Term
-          </Button>
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
-        {terms.length === 0 && (
-          <Card
-            className="flex flex-col items-center justify-center gap-2"
-            variant="placeholder"
-          >
-            <Button
-              icon={<PlusIcon size={18} />}
-              onClick={handleAddTerm}
-              size="sm"
-              variant="ghost"
-            >
-              Add New Term
+    <section className="flex flex-col gap-4">
+      <SectionHeading
+        action={
+          terms.length > 0 && (
+            <Button onClick={() => addTerm()} size="sm" variant="link">
+              <PlusIcon size={14} weight="bold" />
+              Add term
             </Button>
-          </Card>
+          )
+        }
+      >
+        Terms and conditions
+      </SectionHeading>
+      <div className="flex flex-col gap-4">
+        {terms.length === 0 && (
+          <Surface
+            className="flex flex-col items-center justify-center"
+            variant="dashed"
+          >
+            <Button onClick={() => addTerm()} size="sm">
+              <PlusIcon size={14} weight="bold" />
+              Add a term
+            </Button>
+          </Surface>
         )}
-        {terms.map((term, index) => (
-          <Card key={`term-${index + 1}`}>
-            <div className="mb-2 flex items-start justify-between">
-              <h3 className="font-semibold text-lg">Term {index + 1}</h3>
-              <div className="flex items-center">
-                <Button
-                  icon={<CopyIcon size={18} />}
-                  onClick={() => handleDuplicateTerm(index)}
-                  size="sm"
-                  variant="ghost"
-                />
+        {terms.map((term, index) => {
+          const termNumber = index + 1;
 
-                <Button
-                  icon={<TrashIcon size={18} />}
-                  onClick={() => handleRemoveTerm(index)}
-                  size="sm"
-                  variant="ghost"
-                />
+          return (
+            <Surface className="flex flex-col gap-3" key={`term-${termNumber}`}>
+              <div className="flex items-center justify-between">
+                <h3 className="jt-label">Term {termNumber}</h3>
+                <div className="flex items-center gap-1">
+                  <Button
+                    aria-label={`Duplicate term ${termNumber}`}
+                    iconOnly
+                    onClick={() => duplicateTerm(index)}
+                    size="sm"
+                    title="Duplicate"
+                    variant="ghost"
+                  >
+                    <CopyIcon size={14} />
+                  </Button>
+                  <Button
+                    aria-label={`Remove term ${termNumber}`}
+                    iconOnly
+                    onClick={() => removeTerm(index)}
+                    size="sm"
+                    title="Remove"
+                    variant="ghost"
+                  >
+                    <TrashIcon size={14} />
+                  </Button>
+                </div>
               </div>
-            </div>
-            <Textarea
-              id={`term-${index}`}
-              onChange={(value) => handleUpdateTerm(index, value as string)}
-              placeholder="Enter term"
-              value={term}
-            />
-          </Card>
-        ))}
+              <Textarea
+                aria-label={`Term ${termNumber}`}
+                onChange={(event) => updateTerm(index, event.target.value)}
+                placeholder="Enter term"
+                rows={5}
+                value={term}
+              />
+            </Surface>
+          );
+        })}
       </div>
-    </div>
+    </section>
   );
 }

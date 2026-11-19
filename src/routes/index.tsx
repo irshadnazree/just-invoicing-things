@@ -1,4 +1,10 @@
-import { FileTextIcon, PlusIcon, ReceiptIcon } from "@phosphor-icons/react";
+import { Button, EmptyState, Surface } from "@irshadnazree/just-things-ui";
+import {
+  FileTextIcon,
+  PlusIcon,
+  ReceiptIcon,
+  WarningCircleIcon,
+} from "@phosphor-icons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -8,12 +14,8 @@ import {
 } from "@/components/dashboard/DocumentListItem";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { TabFilter } from "@/components/dashboard/TabFilter";
-import { Button } from "@/components/ui/Button";
-import {
-  calculateInvoiceTotal,
-  calculateQuotationTotal,
-  cn,
-} from "@/lib/utils";
+import { PageHeader } from "@/components/shared/page-header";
+import { calculateInvoiceTotal, calculateQuotationTotal } from "@/lib/utils";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useQuotationStore } from "@/stores/quotation-store";
 import type { InvoiceFormData } from "@/types/invoice";
@@ -34,7 +36,9 @@ const TABS = [
   { id: "all", label: "All" },
   { id: "invoices", label: "Invoices" },
   { id: "quotations", label: "Quotations" },
-];
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -53,7 +57,7 @@ function Dashboard() {
   const [quotations, setQuotations] = useState<QuotationFormData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState<TabId>("all");
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -156,103 +160,69 @@ function Dashboard() {
 
   const isEmpty = !isLoading && !error && !hasDocuments;
 
+  const newDocumentActions = (
+    <>
+      <Button onClick={handleNewQuotation}>
+        <FileTextIcon size={16} weight="duotone" />
+        New quotation
+      </Button>
+      <Button onClick={handleNewInvoice} variant="primary">
+        <ReceiptIcon size={16} weight="duotone" />
+        New invoice
+      </Button>
+    </>
+  );
+
   return (
     <div className="flex flex-col gap-8">
-      {/* Header Section */}
-      <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-3xl font-bold text-text">Dashboard</h1>
-        {!isEmpty && (
-          <div className="flex gap-3">
-            <Button
-              icon={
-                <ReceiptIcon className="size-4 xl:size-5" weight="duotone" />
-              }
-              onClick={handleNewInvoice}
-              size="sm"
-            >
-              New Invoice
-            </Button>
-            <Button
-              icon={
-                <FileTextIcon className="size-4 xl:size-5" weight="duotone" />
-              }
-              onClick={handleNewQuotation}
-              size="sm"
-            >
-              New Quotation
-            </Button>
-          </div>
-        )}
-      </section>
+      <PageHeader actions={!isEmpty && newDocumentActions} title="Dashboard" />
 
       {!isLoading && error && (
-        <section className="flex flex-col items-center justify-center gap-4 border border-dashed border-error/40 bg-error/5 py-16 text-center">
-          <div
-            className={cn(
-              "flex size-16 items-center justify-center rounded-full",
-              "bg-error/10 text-error"
-            )}
-          >
-            <FileTextIcon className="size-8" weight="duotone" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-text">
-              Unable to load dashboard
-            </h2>
-            <p className="text-muted">{error}</p>
-          </div>
-          <Button onClick={() => void loadData()} size="sm">
-            Try Again
-          </Button>
-        </section>
+        <Surface variant="dashed">
+          <EmptyState
+            actions={
+              <Button onClick={() => void loadData()} variant="primary">
+                Try again
+              </Button>
+            }
+            description={error}
+            icon={
+              <WarningCircleIcon
+                className="text-bad"
+                size={40}
+                weight="duotone"
+              />
+            }
+            title="Unable to load the dashboard"
+          />
+        </Surface>
       )}
 
-      {/* Empty State */}
       {isEmpty && (
-        <section className="flex flex-col items-center justify-center gap-6 border border-dashed border-text/30 bg-foreground/30 px-6 py-16">
-          <div className="flex size-16 items-center justify-center bg-foreground/50">
-            <PlusIcon className="size-8 text-muted" weight="duotone" />
-          </div>
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-text">Welcome!</h2>
-            <p className="mt-2 text-muted">
-              Create your first invoice or quotation to get started.
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button
-              icon={<ReceiptIcon className="size-4" weight="duotone" />}
-              onClick={handleNewInvoice}
-              size="sm"
-            >
-              New Invoice
-            </Button>
-            <Button
-              icon={<FileTextIcon className="size-4" weight="duotone" />}
-              onClick={handleNewQuotation}
-              size="sm"
-            >
-              New Quotation
-            </Button>
-          </div>
-        </section>
+        <Surface variant="dashed">
+          <EmptyState
+            actions={newDocumentActions}
+            description="Create your first invoice or quotation to get started."
+            icon={<PlusIcon size={40} weight="duotone" />}
+            title="Welcome"
+          />
+        </Surface>
       )}
 
-      {/* Stats Section */}
       {(isLoading || (!error && hasDocuments)) && (
-        <section className="flex flex-col gap-4">
-          <h2 className="font-semibold text-lg text-text">Quick Overview</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
+        <section className="flex flex-col gap-3">
+          <h2 className="jt-label">Overview</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <StatsCard
               count={invoiceCount}
-              icon={<ReceiptIcon className="size-6" weight="duotone" />}
+              icon={<ReceiptIcon size={24} weight="duotone" />}
               isLoading={isLoading}
               label="Invoices"
               onClick={handleViewInvoices}
             />
             <StatsCard
               count={quotationCount}
-              icon={<FileTextIcon className="size-6" weight="duotone" />}
+              icon={<FileTextIcon size={24} weight="duotone" />}
               isLoading={isLoading}
               label="Quotations"
               onClick={handleViewQuotations}
@@ -261,13 +231,10 @@ function Dashboard() {
         </section>
       )}
 
-      {/* Recent Documents Section */}
       {(isLoading || (!error && hasDocuments)) && (
-        <section className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="font-semibold text-lg text-text">
-              Recent Documents
-            </h2>
+        <section className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="jt-label">Recent documents</h2>
             <TabFilter
               activeTab={activeTab}
               onTabChange={setActiveTab}
@@ -275,10 +242,8 @@ function Dashboard() {
             />
           </div>
 
-          {/* Document List */}
           <div className="flex flex-col gap-2">
             {isLoading ? (
-              // Skeleton loading state
               <>
                 <DocumentListItemSkeleton />
                 <DocumentListItemSkeleton />
@@ -287,7 +252,6 @@ function Dashboard() {
                 <DocumentListItemSkeleton />
               </>
             ) : recentDocuments.length > 0 ? (
-              // Document list
               recentDocuments.map((doc) => (
                 <DocumentListItem
                   client={doc.client}
@@ -302,18 +266,9 @@ function Dashboard() {
                 />
               ))
             ) : (
-              // No documents for this filter
-              <div className="flex flex-col items-center justify-center gap-2 border border-dashed border-text/20 bg-foreground/30 py-12 text-center">
-                <p className="text-muted">
-                  No{" "}
-                  {activeTab === "all"
-                    ? "documents"
-                    : activeTab === "invoices"
-                      ? "invoices"
-                      : "quotations"}{" "}
-                  found.
-                </p>
-              </div>
+              <Surface className="jt-muted py-10 text-center" variant="dashed">
+                No {activeTab === "all" ? "documents" : activeTab} yet.
+              </Surface>
             )}
           </div>
         </section>

@@ -1,10 +1,14 @@
+import {
+  Button,
+  Field,
+  Input,
+  NumberField,
+  Select,
+  Surface,
+} from "@irshadnazree/just-things-ui";
 import { CopyIcon, PlusIcon, TrashIcon } from "@phosphor-icons/react";
 
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { FormField, FormLabel } from "@/components/ui/Form";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { SectionHeading } from "@/components/shared/page-header";
 import { formatCurrency } from "@/lib/utils";
 import {
   useInvoiceAddItem,
@@ -19,6 +23,10 @@ import {
 } from "@/stores/invoice-store";
 import type { InvoiceLineItem } from "@/types/invoice";
 
+// Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
+const MONEY_FORMAT = { minimumFractionDigits: 2, maximumFractionDigits: 20 };
+const EXACT_FORMAT = { maximumFractionDigits: 20 };
+
 export default function LineItemSection() {
   const currency = useInvoiceCurrency();
   const items = useInvoiceItems();
@@ -30,177 +38,147 @@ export default function LineItemSection() {
   const removeItemDetail = useInvoiceRemoveItemDetail();
   const updateItemDetail = useInvoiceUpdateItemDetail();
 
-  function handleAddItem() {
-    addItem();
-  }
-
   function handleUpdateItem(index: number, field: string, value: unknown) {
     updateItem(index, field as keyof InvoiceLineItem, value as never);
   }
 
-  function handleDuplicateItem(index: number) {
-    duplicateItem(index);
-  }
-
-  function handleRemoveItem(index: number) {
-    removeItem(index);
-  }
-
-  function handleAddItemDetail(itemIndex: number) {
-    addItemDetail(itemIndex);
-  }
-
-  function handleUpdateItemDetail(
-    itemIndex: number,
-    detailIndex: number,
-    value: unknown
-  ) {
-    updateItemDetail(itemIndex, detailIndex, value as string);
-  }
-
-  function handleRemoveItemDetail(itemIndex: number, detailIndex: number) {
-    removeItemDetail(itemIndex, detailIndex);
-  }
-
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between border-b-2 pb-1">
-        <h3 className="border-text font-semibold text-lg">Line Items</h3>
-        {items.length > 0 && (
-          <Button
-            icon={<PlusIcon size={18} weight="bold" />}
-            onClick={handleAddItem}
-            size="sm"
-            variant="ghost"
-          >
-            Add Item
-          </Button>
-        )}
-      </div>
-      <div className="flex flex-col gap-6">
-        {items.length === 0 && (
-          <Card
-            className="flex flex-col items-center justify-center gap-2"
-            variant="placeholder"
-          >
-            <Button
-              icon={<PlusIcon size={18} />}
-              onClick={handleAddItem}
-              size="sm"
-              variant="ghost"
-            >
-              Add New Line Item
+    <section className="flex flex-col gap-4">
+      <SectionHeading
+        action={
+          items.length > 0 && (
+            <Button onClick={() => addItem()} size="sm" variant="link">
+              <PlusIcon size={14} weight="bold" />
+              Add item
             </Button>
-          </Card>
+          )
+        }
+      >
+        Line items
+      </SectionHeading>
+      <div className="flex flex-col gap-4">
+        {items.length === 0 && (
+          <Surface
+            className="flex flex-col items-center justify-center"
+            variant="dashed"
+          >
+            <Button onClick={() => addItem()} size="sm">
+              <PlusIcon size={14} weight="bold" />
+              Add a line item
+            </Button>
+          </Surface>
         )}
-        {items.map((item, itemIndex) => (
-          <Card key={`item-${itemIndex + 1}`}>
-            <div className="mb-2 flex items-start justify-between">
-              <p>Item {itemIndex + 1}</p>
-              <div className="flex items-center">
-                <Button
-                  aria-label={`Duplicate item ${itemIndex + 1}`}
-                  icon={<CopyIcon size={18} />}
-                  onClick={() => handleDuplicateItem(itemIndex)}
-                  size="sm"
-                  variant="ghost"
-                />
+        {items.map((item, itemIndex) => {
+          const itemNumber = itemIndex + 1;
+          const itemCurrency = item.currency || currency || "RM";
 
-                <Button
-                  aria-label={`Remove item ${itemIndex + 1}`}
-                  icon={<TrashIcon size={18} />}
-                  onClick={() => handleRemoveItem(itemIndex)}
-                  size="sm"
-                  variant="ghost"
-                />
+          return (
+            <Surface
+              className="flex flex-col gap-4"
+              key={`item-${itemNumber}`}
+              render={<article aria-label={`Item ${itemNumber}`} />}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="jt-label">Item {itemNumber}</h3>
+                <div className="flex items-center gap-1">
+                  <Button
+                    aria-label={`Duplicate item ${itemNumber}`}
+                    iconOnly
+                    onClick={() => duplicateItem(itemIndex)}
+                    size="sm"
+                    title="Duplicate"
+                    variant="ghost"
+                  >
+                    <CopyIcon size={14} />
+                  </Button>
+                  <Button
+                    aria-label={`Remove item ${itemNumber}`}
+                    iconOnly
+                    onClick={() => removeItem(itemIndex)}
+                    size="sm"
+                    title="Remove"
+                    variant="ghost"
+                  >
+                    <TrashIcon size={14} />
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            <div className="mb-4 grid grid-cols-2 gap-4 md:grid-cols-5">
-              <FormField className="col-span-2 xl:col-span-3">
-                <FormLabel id="item-name" label="Item Name" />
-                <Input
-                  id={`item-name-${itemIndex}`}
-                  onChange={(value) =>
-                    handleUpdateItem(itemIndex, "name", value as string)
-                  }
-                  value={item.name}
-                />
-              </FormField>
-              <FormField className="col-span-1">
-                <FormLabel id="item-code" label="Code" />
-                <Input
-                  id={`item-code-${itemIndex}`}
-                  onChange={(value) =>
-                    handleUpdateItem(itemIndex, "code", value as string)
-                  }
-                  value={item.code}
-                />
-              </FormField>
-              <FormField>
-                <FormLabel id="item-quantity" label="Quantity" />
-                <Input
-                  id={`item-quantity-${itemIndex}`}
-                  onChange={(value) =>
-                    handleUpdateItem(itemIndex, "quantity", value as number)
-                  }
-                  type="number"
-                  value={item.quantity || 0}
-                />
-              </FormField>
-              <FormField>
-                <FormLabel id="item-rate" label="Rate" />
-                <Input
-                  id={`item-rate-${itemIndex}`}
-                  onChange={(value) =>
-                    handleUpdateItem(itemIndex, "rate", value as number)
-                  }
-                  type="number"
-                  value={item.rate || 0}
-                />
-              </FormField>
-              <FormField>
-                <FormLabel id="item-currency" label="Currency" />
-                <Select
-                  id={`item-currency-${itemIndex}`}
-                  onChange={(value) =>
-                    handleUpdateItem(itemIndex, "currency", value)
-                  }
-                  options={[
-                    { value: "RM", label: "MYR" },
-                    { value: "USD", label: "USD" },
-                  ]}
-                  value={item.currency || currency || "RM"}
-                />
-              </FormField>
-              <FormField>
-                <FormLabel id="item-amount" label="Amount" />
-                <Input
-                  disabled
-                  className="tabular-nums"
-                  id={`item-amount-${itemIndex}`}
-                  type="text"
-                  value={formatCurrency(
-                    item.quantity * item.rate || 0,
-                    item.currency || currency || "RM"
-                  )}
-                />
-              </FormField>
-            </div>
-
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <FormLabel id="item-details" label="Details" />
-                <Button
-                  icon={<PlusIcon size={18} />}
-                  onClick={() => handleAddItemDetail(itemIndex)}
-                  size="sm"
-                  variant="ghost"
-                >
-                  Add Detail
-                </Button>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+                <Field className="col-span-2 xl:col-span-3" label="Item name">
+                  <Input
+                    onValueChange={(value) =>
+                      handleUpdateItem(itemIndex, "name", value)
+                    }
+                    value={item.name}
+                  />
+                </Field>
+                <Field label="Code">
+                  <Input
+                    inputClassName="jt-mono"
+                    onValueChange={(value) =>
+                      handleUpdateItem(itemIndex, "code", value)
+                    }
+                    value={item.code}
+                  />
+                </Field>
+                <Field label="Quantity">
+                  <NumberField
+                    format={EXACT_FORMAT}
+                    onValueChange={(value) =>
+                      handleUpdateItem(itemIndex, "quantity", value ?? 0)
+                    }
+                    value={item.quantity || 0}
+                  />
+                </Field>
+                <Field label="Rate">
+                  <NumberField
+                    format={MONEY_FORMAT}
+                    onValueChange={(value) =>
+                      handleUpdateItem(itemIndex, "rate", value ?? 0)
+                    }
+                    value={item.rate || 0}
+                  />
+                </Field>
+                <Field label="Currency">
+                  <Select
+                    onChange={(event) =>
+                      handleUpdateItem(
+                        itemIndex,
+                        "currency",
+                        event.target.value
+                      )
+                    }
+                    value={itemCurrency}
+                  >
+                    <option value="RM">MYR</option>
+                    <option value="USD">USD</option>
+                  </Select>
+                </Field>
+                <Field label="Amount">
+                  <Input
+                    inputClassName="jt-mono jt-num"
+                    readOnly
+                    value={formatCurrency(
+                      item.quantity * item.rate || 0,
+                      itemCurrency
+                    )}
+                  />
+                </Field>
               </div>
+
               <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="jt-label">Details</h4>
+                  <Button
+                    onClick={() => addItemDetail(itemIndex)}
+                    size="sm"
+                    variant="link"
+                  >
+                    <PlusIcon size={14} weight="bold" />
+                    Add detail
+                  </Button>
+                </div>
                 {item.details.map((detail, detailIndex) => (
                   <div
                     className="flex items-center gap-2"
@@ -208,33 +186,31 @@ export default function LineItemSection() {
                     key={`detail-${itemIndex}-${detailIndex}`}
                   >
                     <Input
-                      id={`item-detail-${itemIndex}-${detailIndex}`}
-                      onChange={(value) =>
-                        handleUpdateItemDetail(
-                          itemIndex,
-                          detailIndex,
-                          value as string
-                        )
+                      aria-label={`Item ${itemNumber} detail ${detailIndex + 1}`}
+                      className="flex-1"
+                      onValueChange={(value) =>
+                        updateItemDetail(itemIndex, detailIndex, value)
                       }
                       placeholder="Enter detail"
                       value={detail}
                     />
                     <Button
                       aria-label={`Remove detail ${detailIndex + 1}`}
-                      icon={<TrashIcon size={18} />}
-                      onClick={() =>
-                        handleRemoveItemDetail(itemIndex, detailIndex)
-                      }
+                      iconOnly
+                      onClick={() => removeItemDetail(itemIndex, detailIndex)}
                       size="sm"
+                      title="Remove detail"
                       variant="ghost"
-                    />
+                    >
+                      <TrashIcon size={14} />
+                    </Button>
                   </div>
                 ))}
               </div>
-            </div>
-          </Card>
-        ))}
+            </Surface>
+          );
+        })}
       </div>
-    </div>
+    </section>
   );
 }

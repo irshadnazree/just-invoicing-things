@@ -1,3 +1,4 @@
+import { Button, ConfirmDialog, useToast } from "@irshadnazree/just-things-ui";
 import {
   ArrowUUpLeftIcon,
   DownloadIcon,
@@ -10,10 +11,8 @@ import { useShallow } from "zustand/react/shallow";
 
 import { useNavigationWarning } from "@/components/hooks/use-navigation-warning";
 import FormWrapper from "@/components/page/quotation/form-wrapper";
-import { Button } from "@/components/ui/Button";
-import { ConfirmationDialog } from "@/components/ui/Dialog";
-import { SaveIndicator } from "@/components/ui/SaveIndicator";
-import { useToastManager } from "@/lib/provider/toast-provider";
+import { PageHeader } from "@/components/shared/page-header";
+import { SaveStatus } from "@/components/shared/save-status";
 import { exportJSON, readJsonFile } from "@/lib/utils";
 import { useQuotationStore } from "@/stores/quotation-store";
 import { isQuotationValid } from "@/utils/quotation";
@@ -26,7 +25,7 @@ export const Route = createFileRoute("/quotation/$quotation")({
 function RouteComponent() {
   const { quotationId } = Route.useLoaderData();
   const router = useRouter();
-  const { add } = useToastManager();
+  const { add } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasPendingSave = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -72,7 +71,7 @@ function RouteComponent() {
   } = useNavigationWarning({
     enabled: hasUnsavedChanges,
     allowedPaths: ["/quotation/preview"],
-    title: "Unsaved Changes",
+    title: "Unsaved changes",
     description:
       "You have started filling out this quotation but haven't saved it yet. If you leave now, your progress will be lost.",
     confirmLabel: "Leave",
@@ -126,6 +125,8 @@ function RouteComponent() {
       if (!success) {
         add({
           title: "Failed to save quotation",
+          description:
+            "The browser refused the write. Its storage may be full.",
           type: "error",
         });
       }
@@ -178,87 +179,73 @@ function RouteComponent() {
   };
 
   return (
-    <section className="flex flex-col gap-5">
-      <div className="flex flex-col items-start justify-between gap-4 xl:flex-row xl:items-center xl:gap-0">
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold">
-            {quotationId === "new" ? "Create Quotation" : "Edit Quotation"}
-          </h1>
-          <Button
-            aria-label="Go back"
-            icon={
-              <ArrowUUpLeftIcon
-                className="size-4 xl:size-5"
-                size={20}
-                weight="bold"
-              />
-            }
-            onClick={() => router.navigate({ to: "/quotation" })}
-            size="sm"
-          />
-          <SaveIndicator show={isSaving} />
-        </div>
-        <div className="flex items-center gap-1 xl:gap-2">
-          {formData.id && formData.id !== "" && (
+    <section className="flex flex-col gap-6">
+      <PageHeader
+        actions={
+          <>
             <Button
-              icon={
-                <EyeIcon className="size-4 xl:size-5" size={20} weight="bold" />
-              }
-              onClick={() => router.navigate({ to: "/quotation/preview" })}
-              size="sm"
+              aria-label="Import JSON"
+              iconOnly
+              onClick={() => fileInputRef.current?.click()}
+              title="Import JSON"
             >
-              Preview
+              <UploadIcon size={16} weight="bold" />
             </Button>
-          )}
-
+            <input
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(event) => handleImportJSON(event)}
+              ref={fileInputRef}
+              tabIndex={-1}
+              type="file"
+            />
+            <Button
+              aria-label="Export JSON"
+              iconOnly
+              onClick={handleExportJSON}
+              title="Export JSON"
+            >
+              <DownloadIcon size={16} weight="bold" />
+            </Button>
+            {formData.id && formData.id !== "" && (
+              <Button
+                onClick={() => router.navigate({ to: "/quotation/preview" })}
+                variant="primary"
+              >
+                <EyeIcon size={16} weight="bold" />
+                Preview
+              </Button>
+            )}
+          </>
+        }
+        leading={
           <Button
-            aria-label="Import JSON"
-            icon={
-              <UploadIcon
-                className="size-4 xl:size-5"
-                size={20}
-                weight="bold"
-              />
-            }
-            onClick={() => fileInputRef.current?.click()}
-            size="sm"
-          />
-          <input
-            onChange={(event) => handleImportJSON(event)}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            type="file"
-          />
-          <Button
-            aria-label="Export JSON"
-            icon={
-              <DownloadIcon
-                className="size-4 xl:size-5"
-                size={20}
-                weight="bold"
-              />
-            }
-            onClick={handleExportJSON}
-            size="sm"
-          />
-        </div>
-      </div>
+            aria-label="Back to quotations"
+            iconOnly
+            onClick={() => router.navigate({ to: "/quotation" })}
+            variant="ghost"
+          >
+            <ArrowUUpLeftIcon size={16} weight="bold" />
+          </Button>
+        }
+        status={<SaveStatus saving={isSaving} />}
+        title={quotationId === "new" ? "Create quotation" : "Edit quotation"}
+      />
       <FormWrapper />
 
-      <ConfirmationDialog
+      <ConfirmDialog
         cancelLabel={cancelLabel}
         confirmLabel={confirmLabel}
         description={description}
-        onCancel={cancelNavigation}
         onConfirm={confirmNavigation}
-        open={isDialogOpen}
-        title={title}
-        variant="warning"
         onOpenChange={(open) => {
           if (!open) {
             cancelNavigation();
           }
         }}
+        open={isDialogOpen}
+        title={title}
+        tone="danger"
       />
     </section>
   );

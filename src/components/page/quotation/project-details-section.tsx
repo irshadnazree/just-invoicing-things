@@ -1,8 +1,8 @@
+import { Field, Input, Select } from "@irshadnazree/just-things-ui";
 import { memo } from "react";
 
-import { FormField, FormLabel } from "@/components/ui/Form";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { SectionHeading } from "@/components/shared/page-header";
+import { openDatePicker } from "@/lib/date-input";
 import { useQuotationData } from "@/stores/quotation-store";
 import type { QuotationStore } from "@/types/quotation";
 
@@ -28,99 +28,74 @@ function ProjectDetailsSectionComponent({
 
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <h3 className="border-text border-b-2 pb-2 font-semibold text-lg">
-          Project Details
-        </h3>
-        <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
-          <FormField className="col-span-1 xl:col-span-2">
-            <FormLabel id="project-title" label="Project Title" />
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Project details</SectionHeading>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <Field className="xl:col-span-2" label="Project title">
             <Input
-              id="project-title"
-              onChange={(value) =>
-                onUpdateField("projectTitle", value as string)
-              }
+              onValueChange={(value) => onUpdateField("projectTitle", value)}
               value={projectTitle}
             />
-          </FormField>
-          <FormField>
-            <FormLabel id="quotation-id" label="Quotation No #" />
+          </Field>
+          <Field label="Quotation no.">
             <Input
-              id="quotation-id"
-              onChange={(value) =>
-                onUpdateField("quotationId", value as string)
-              }
-              type="text"
+              inputClassName="jt-mono"
+              onValueChange={(value) => onUpdateField("quotationId", value)}
               value={quotationId}
             />
-          </FormField>
-          <FormField>
-            <FormLabel id="quotation-date" label="Quotation Date" />
+          </Field>
+          <Field label="Quotation date">
             <Input
-              id="quotation-date"
-              onChange={(value) =>
-                onUpdateField("quotationDate", value as string)
-              }
+              onClick={openDatePicker}
+              onValueChange={(value) => onUpdateField("quotationDate", value)}
               type="date"
               value={quotationDate}
             />
-          </FormField>
-          <FormField>
-            <FormLabel id="payment-type" label="Payment Type" />
+          </Field>
+          <Field label="Payment type">
             <Select
-              id="payment-type"
-              onChange={(value) =>
-                onUpdateField("paymentType", value as string)
+              onChange={(event) =>
+                onUpdateField(
+                  "paymentType",
+                  event.target.value as typeof paymentType
+                )
               }
-              options={[
-                { value: "One-time payment", label: "One-time payment" },
-                { value: "Recurring payment", label: "Recurring payment" },
-              ]}
               value={paymentType}
-            />
-          </FormField>
-          <FormField>
-            <FormLabel id="bank-account" label="Bank Account Number" />
+            >
+              <option value="One-time payment">One-time payment</option>
+              <option value="Recurring payment">Recurring payment</option>
+            </Select>
+          </Field>
+          <Field label="Bank account number">
             <Input
-              id="bank-account"
-              onChange={(value) =>
-                onUpdateField("bankAccount", value as string)
-              }
-              type="text"
+              inputClassName="jt-mono"
+              onValueChange={(value) => onUpdateField("bankAccount", value)}
               value={bankAccount}
             />
-          </FormField>
+          </Field>
         </div>
-      </div>
-      <div className="flex flex-col gap-3">
-        <h3 className="border-text border-b-2 pb-2 font-semibold text-lg">
-          Client Information
-        </h3>
-        <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
-          <FormField>
-            <FormLabel id="quotation-from-company" label="Quotation From" />
+      </section>
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Client</SectionHeading>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <Field label="Quotation from">
             <Input
-              id="quotation-from-company"
-              onChange={(value) =>
-                onUpdateNestedField("quotationFrom", "company", value as string)
+              onValueChange={(value) =>
+                onUpdateNestedField("quotationFrom", "company", value)
               }
-              type="text"
               value={quotationFrom.company}
             />
-          </FormField>
-          <FormField>
-            <FormLabel id="quotation-for-company" label="Quotation For" />
+          </Field>
+          <Field label="Quotation for">
             <Input
-              id="quotation-for-company"
-              onChange={(value) =>
-                onUpdateNestedField("quotationFor", "company", value as string)
+              onValueChange={(value) =>
+                onUpdateNestedField("quotationFor", "company", value)
               }
-              type="text"
               value={quotationFor.company}
             />
-          </FormField>
+          </Field>
         </div>
-      </div>
+      </section>
     </>
   );
 }

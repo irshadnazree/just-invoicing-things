@@ -1,4 +1,10 @@
-import { Receipt, TrashIcon } from "@phosphor-icons/react";
+import {
+  Button,
+  ConfirmDialog,
+  Input,
+  Spinner,
+} from "@irshadnazree/just-things-ui";
+import { ReceiptIcon, TrashIcon } from "@phosphor-icons/react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
@@ -7,10 +13,7 @@ import NoResultSection from "@/components/shared/history/no-result-view";
 import TableView, {
   type TableColumn,
 } from "@/components/shared/history/table-view";
-import { Button } from "@/components/ui/Button";
-import { ConfirmationDialog } from "@/components/ui/Dialog";
-import { Input } from "@/components/ui/Input";
-import { Loader } from "@/components/ui/Loader";
+import { PageHeader } from "@/components/shared/page-header";
 import { calculateInvoiceTotal, formatCurrency } from "@/lib/utils";
 import { initialFormData, useInvoiceStore } from "@/stores/invoice-store";
 import type { InvoiceFormData, InvoiceListItem } from "@/types/invoice";
@@ -94,31 +97,30 @@ function RouteComponent() {
   const columns: TableColumn<InvoiceListItem>[] = [
     {
       key: "invoiceId",
-      label: "Id",
-      width: "w-[15%]",
-      cellClassName: "whitespace-nowrap font-medium tabular-nums",
+      label: "No.",
+      width: "w-36",
+      cellClassName: "whitespace-nowrap",
       renderCell: (invoice) => (
-        <button
-          className="block max-w-full cursor-pointer truncate text-primary-text transition-opacity hover:opacity-80 tabular-nums"
+        <Button
+          className="jt-mono max-w-full justify-start"
           onClick={() => handleOpenInvoice(invoice.id)}
           title={invoice.invoiceId || "No ID"}
-          type="button"
+          variant="link"
         >
-          {invoice.invoiceId || "No ID"}
-        </button>
+          <span className="truncate">{invoice.invoiceId || "No ID"}</span>
+        </Button>
       ),
     },
     {
       key: "invoiceDate",
       label: "Date",
-      width: "w-[15%]",
+      width: "w-32",
       cellClassName: "whitespace-nowrap",
       renderCell: (invoice) => invoice.invoiceDate,
     },
     {
       key: "invoiceFor",
       label: "Client",
-      width: "w-[40%]",
       cellClassName: "min-w-0",
       renderCell: (invoice) => (
         <span className="block truncate" title={invoice.invoiceFor}>
@@ -129,11 +131,18 @@ function RouteComponent() {
     {
       key: "total",
       label: "Total",
-      width: "w-[15%]",
-      cellClassName: "whitespace-nowrap tabular-nums",
+      width: "w-40",
+      cellClassName: "jt-mono whitespace-nowrap",
+      numeric: true,
       renderCell: (invoice) => formatCurrency(invoice.total, invoice.currency),
     },
   ];
+
+  // A selection can't outlive the search that showed it, or bulk delete could hit hidden rows
+  function handleSearch(value: string) {
+    setSearchTerm(value);
+    setSelectedInvoices(new Set());
+  }
 
   function cancelDelete() {
     setPendingDeleteId(null);
@@ -184,7 +193,7 @@ function RouteComponent() {
     return (
       <section className="flex flex-col gap-6">
         <div className="flex min-h-96 items-center justify-center">
-          <Loader text="Loading invoices..." />
+          <Spinner label="Loading invoices" size="lg" />
         </div>
       </section>
     );
@@ -192,75 +201,64 @@ function RouteComponent() {
 
   return (
     <section className="flex flex-col gap-6">
-      <ConfirmationDialog
+      <ConfirmDialog
         confirmLabel="Delete"
-        description="Are you sure you want to delete this invoice?"
-        onCancel={cancelDelete}
+        description="This can't be undone."
         onConfirm={confirmDelete}
-        open={pendingDeleteId !== null}
-        title="Confirm Delete"
-        variant="warning"
         onOpenChange={(open) => {
           if (!open) {
             cancelDelete();
           }
         }}
+        open={pendingDeleteId !== null}
+        title="Delete this invoice?"
+        tone="danger"
       />
 
-      <ConfirmationDialog
-        confirmLabel={`Delete ${selectedInvoices.size} Item(s)`}
-        description={`Are you sure you want to delete ${selectedInvoices.size} invoice(s)?`}
-        onCancel={cancelBulkDelete}
+      <ConfirmDialog
+        confirmLabel={`Delete ${selectedInvoices.size}`}
+        description="This can't be undone."
         onConfirm={confirmBulkDelete}
-        open={pendingBulkDelete}
-        title="Confirm Bulk Delete"
-        variant="warning"
         onOpenChange={(open) => {
           if (!open) {
             cancelBulkDelete();
           }
         }}
+        open={pendingBulkDelete}
+        title={`Delete ${selectedInvoices.size} ${selectedInvoices.size === 1 ? "invoice" : "invoices"}?`}
+        tone="danger"
       />
 
-      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center md:gap-0">
-        <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold">Invoices</h1>
-          {invoices.length > 0 && (
-            <Button
-              icon={<Receipt className="size-4 xl:size-5" weight="duotone" />}
-              onClick={handleCreateInvoice}
-              size="sm"
-            >
-              New Invoice
-            </Button>
-          )}
-        </div>
-        <div className="flex w-full items-center gap-4 md:w-auto">
-          {selectedInvoices.size > 0 && (
-            <Button
-              aria-label="Delete selected"
-              icon={<TrashIcon className="size-4 xl:size-5" size={20} />}
-              onClick={handleBulkDelete}
-              size="sm"
-              variant="ghost"
+      <PageHeader
+        actions={
+          <>
+            {selectedInvoices.size > 0 && (
+              <Button onClick={handleBulkDelete} variant="danger">
+                <TrashIcon size={16} />
+                Delete {selectedInvoices.size}
+              </Button>
+            )}
+            <Input
+              aria-label="Search invoices"
+              className="min-w-0 flex-1 sm:w-64 sm:flex-none"
+              onValueChange={handleSearch}
+              placeholder="Search invoices"
+              type="search"
+              value={searchTerm}
             />
-          )}
-
-          <label className="sr-only" htmlFor="search">
-            Search invoices
-          </label>
-          <Input
-            id="search"
-            onChange={(value) => setSearchTerm(value as string)}
-            placeholder="Search invoices..."
-            type="text"
-            value={searchTerm}
-          />
-        </div>
-      </div>
+            {invoices.length > 0 && (
+              <Button onClick={handleCreateInvoice} variant="primary">
+                <ReceiptIcon size={16} weight="bold" />
+                New invoice
+              </Button>
+            )}
+          </>
+        }
+        title="Invoices"
+      />
 
       {sortedInvoices.length === 0 && searchTerm !== "" && (
-        <NoResultSection setSearchTerm={setSearchTerm} title="invoices" />
+        <NoResultSection setSearchTerm={handleSearch} title="invoices" />
       )}
       {invoices.length === 0 && searchTerm === "" && (
         <EmptyListView handleCreate={handleCreateInvoice} title="invoices" />
@@ -268,7 +266,6 @@ function RouteComponent() {
 
       {sortedInvoices.length > 0 && (
         <TableView
-          actionColumnWidth="w-[15%]"
           columns={columns}
           duplicateItem={duplicateInvoice}
           getItemLabel={(item) => item.invoiceId || item.id}
@@ -283,9 +280,9 @@ function RouteComponent() {
       )}
 
       {sortedInvoices.length > 0 && (
-        <div className="mt-4 text-sm text-text">
+        <p className="jt-muted text-sm">
           Showing {sortedInvoices.length} of {formattedInvoices.length} invoices
-        </div>
+        </p>
       )}
     </section>
   );
