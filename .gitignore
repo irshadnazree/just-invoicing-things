@@ -25,3 +25,6 @@ todos.json
 .cursor/
 .opencode/
 .taste-skill/
+
+# Local formal-verification models
+verification/
