@@ -1,5 +1,5 @@
 import { useBlocker } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type UseNavigationWarningProps = {
   enabled: boolean;
@@ -24,13 +24,14 @@ export type NavigationWarningState = {
 export function useNavigationWarning({
   enabled,
   allowedPaths = [],
-  title = "Unsaved Changes",
+  title = "Unsaved changes",
   description = "You have unsaved changes. Are you sure you want to leave?",
   confirmLabel = "Leave",
   cancelLabel = "Stay",
 }: UseNavigationWarningProps): NavigationWarningState {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<{
+  // A ref, so the dialog closing right after Leave can't also reset the navigation it just let through
+  const pendingNavigation = useRef<{
     proceed: () => void;
     reset: () => void;
   } | null>(null);
@@ -46,10 +47,10 @@ export function useNavigationWarning({
   useEffect(() => {
     if (blocker.status === "blocked") {
       setIsDialogOpen(true);
-      setPendingNavigation({
+      pendingNavigation.current = {
         proceed: blocker.proceed,
         reset: blocker.reset,
-      });
+      };
     }
   }, [blocker]);
 
@@ -69,16 +70,18 @@ export function useNavigationWarning({
   }, [enabled]);
 
   const confirmNavigation = useCallback(() => {
-    pendingNavigation?.proceed();
+    const pending = pendingNavigation.current;
+    pendingNavigation.current = null;
+    pending?.proceed();
     setIsDialogOpen(false);
-    setPendingNavigation(null);
-  }, [pendingNavigation]);
+  }, []);
 
   const cancelNavigation = useCallback(() => {
-    pendingNavigation?.reset();
+    const pending = pendingNavigation.current;
+    pendingNavigation.current = null;
+    pending?.reset();
     setIsDialogOpen(false);
-    setPendingNavigation(null);
-  }, [pendingNavigation]);
+  }, []);
 
   return {
     isDialogOpen,
