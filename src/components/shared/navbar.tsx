@@ -1,4 +1,8 @@
-import { AppHeader, ThemeToggle } from "@irshadnazree/just-things-ui";
+import {
+  AppHeader,
+  AppHeaderBadge,
+  ThemeToggle,
+} from "@irshadnazree/just-things-ui";
 import { Link, useLocation } from "@tanstack/react-router";
 
 const links = [
@@ -18,9 +22,13 @@ export default function Navbar() {
 
   return (
     <AppHeader
-      actions={<ThemeToggle />}
+      actions={
+        <>
+          <AppHeaderBadge>Saved in this browser only</AppHeaderBadge>
+          <ThemeToggle />
+        </>
+      }
       app="invoicing"
-      badge="Saved in this browser only"
       className="app-header w-full print:hidden"
       homeRender={<Link to="/" />}
       nav={links.map(({ to, label }) => (
