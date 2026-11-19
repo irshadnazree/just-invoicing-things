@@ -7,11 +7,14 @@ export function loadFromStorage<T>(key: string): T[] {
   }
 }
 
-export function saveToStorage<T>(key: string, items: T[]): void {
+/** Returns false when the browser refuses the write, such as when storage is full. */
+export function saveToStorage<T>(key: string, items: T[]): boolean {
   try {
     localStorage.setItem(key, JSON.stringify(items));
+    return true;
   } catch {
     console.warn(`Failed to save ${key} to localStorage`);
+    return false;
   }
 }
 
@@ -55,8 +58,7 @@ export function saveItemToArray<
       items.splice(limit);
     }
 
-    saveToStorage(key, items);
-    return true;
+    return saveToStorage(key, items);
   } catch {
     return false;
   }
