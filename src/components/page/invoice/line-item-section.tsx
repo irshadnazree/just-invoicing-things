@@ -21,9 +21,8 @@ import {
   useInvoiceUpdateItem,
   useInvoiceUpdateItemDetail,
 } from "@/stores/invoice-store";
-import type { InvoiceLineItem } from "@/types/invoice";
 
-// Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
+// WARNING: Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
 const MONEY_FORMAT = { minimumFractionDigits: 2, maximumFractionDigits: 20 };
 const EXACT_FORMAT = { maximumFractionDigits: 20 };
 
@@ -37,10 +36,6 @@ export default function LineItemSection() {
   const addItemDetail = useInvoiceAddItemDetail();
   const removeItemDetail = useInvoiceRemoveItemDetail();
   const updateItemDetail = useInvoiceUpdateItemDetail();
-
-  function handleUpdateItem(index: number, field: string, value: unknown) {
-    updateItem(index, field as keyof InvoiceLineItem, value as never);
-  }
 
   return (
     <section className="flex flex-col gap-4">
@@ -108,7 +103,7 @@ export default function LineItemSection() {
                 <Field className="col-span-2 xl:col-span-3" label="Item name">
                   <Input
                     onValueChange={(value) =>
-                      handleUpdateItem(itemIndex, "name", value)
+                      updateItem(itemIndex, "name", value)
                     }
                     value={item.name}
                   />
@@ -117,7 +112,7 @@ export default function LineItemSection() {
                   <Input
                     inputClassName="jt-mono"
                     onValueChange={(value) =>
-                      handleUpdateItem(itemIndex, "code", value)
+                      updateItem(itemIndex, "code", value)
                     }
                     value={item.code}
                   />
@@ -126,7 +121,7 @@ export default function LineItemSection() {
                   <NumberField
                     format={EXACT_FORMAT}
                     onValueChange={(value) =>
-                      handleUpdateItem(itemIndex, "quantity", value ?? 0)
+                      updateItem(itemIndex, "quantity", value ?? 0)
                     }
                     value={item.quantity || 0}
                   />
@@ -135,7 +130,7 @@ export default function LineItemSection() {
                   <NumberField
                     format={MONEY_FORMAT}
                     onValueChange={(value) =>
-                      handleUpdateItem(itemIndex, "rate", value ?? 0)
+                      updateItem(itemIndex, "rate", value ?? 0)
                     }
                     value={item.rate || 0}
                   />
@@ -143,11 +138,7 @@ export default function LineItemSection() {
                 <Field label="Currency">
                   <Select
                     onChange={(event) =>
-                      handleUpdateItem(
-                        itemIndex,
-                        "currency",
-                        event.target.value
-                      )
+                      updateItem(itemIndex, "currency", event.target.value)
                     }
                     value={itemCurrency}
                   >
@@ -182,7 +173,6 @@ export default function LineItemSection() {
                 {item.details.map((detail, detailIndex) => (
                   <div
                     className="flex items-center gap-2"
-                    // biome-ignore lint/suspicious/noArrayIndexKey: Details are not reordered, stable index prevents focus loss
                     key={`detail-${itemIndex}-${detailIndex}`}
                   >
                     <Input

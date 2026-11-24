@@ -1,15 +1,16 @@
-import { type ClassValue, clsx } from "clsx";
+import { clsx } from "clsx";
+import type { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs));
 }
 
 export function sanitizeFilename(str: string) {
   return str
-    .replace(/[^a-z0-9]/gi, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
+    .replaceAll(/[^a-z0-9]/gi, "-")
+    .replaceAll(/-+/g, "-")
+    .replaceAll(/^-|-$/g, "")
     .toUpperCase();
 }
 
@@ -30,18 +31,20 @@ type PricedItem = {
   rate: number;
 };
 
-function calculateItemsTotal(items: PricedItem[]) {
+function calculateItemsTotal(items: Array<PricedItem>) {
   return items.reduce((sum, item) => sum + item.quantity * item.rate, 0);
 }
 
 export function calculateInvoiceTotal(invoice: {
-  items: PricedItem[];
+  items: Array<PricedItem>;
   reductionAmount?: number;
 }) {
   return calculateItemsTotal(invoice.items) - (invoice.reductionAmount || 0);
 }
 
-export function calculateQuotationTotal(quotation: { items: PricedItem[] }) {
+export function calculateQuotationTotal(quotation: {
+  items: Array<PricedItem>;
+}) {
   return calculateItemsTotal(quotation.items);
 }
 
@@ -51,7 +54,7 @@ export function downloadFile(
   type = "application/json"
 ) {
   const blob =
-    content instanceof Blob ? content : new Blob([content], { type });
+    typeof content === "string" ? new Blob([content], { type }) : content;
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -65,6 +68,7 @@ export function exportJSON(data: unknown, filename: string) {
   downloadFile(dataStr, filename, "application/json");
 }
 
+// oxlint-disable-next-line quality/no-unknown-returns -- callers own the shape of the imported JSON
 export async function readJsonFile(file: File): Promise<unknown> {
   try {
     const jsonData = JSON.parse(await file.text()) as unknown;

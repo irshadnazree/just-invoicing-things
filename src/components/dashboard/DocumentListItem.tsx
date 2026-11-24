@@ -88,14 +88,14 @@ export function DocumentListItem({
 
   const handleClick = () => {
     if (type === "invoice") {
-      navigate({
+      void navigate({
         to: "/invoice/$invoice",
         params: { invoice: id },
       });
       return;
     }
 
-    navigate({
+    void navigate({
       to: "/quotation/$quotation",
       params: { quotation: id },
     });

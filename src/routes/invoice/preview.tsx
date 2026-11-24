@@ -2,7 +2,6 @@ import { Button, EmptyState, Surface } from "@irshadnazree/just-things-ui";
 import { ArrowUUpLeftIcon, PrinterIcon } from "@phosphor-icons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { DocumentPrintStyles } from "@/components/shared/document-print-styles";
 import { PageHeader } from "@/components/shared/page-header";
 import { formatDecimal, generatePrintFilename } from "@/lib/utils";
 import { useInvoiceStore } from "@/stores/invoice-store";
@@ -25,26 +24,21 @@ function RouteComponent() {
   const hasDocument = formData.id !== "";
 
   function goBack() {
-    navigate({
+    void navigate({
       to: "/invoice/$invoice",
       params: { invoice: formData.id || "new" },
     });
   }
 
   function printInvoice() {
-    // Save original title
     const originalTitle = document.title;
-    // Create filename from invoice details
     const printTitle = generatePrintFilename(
       formData.invoiceFrom.company || "",
       formData.invoiceTo.company || "",
       formData.invoiceId || ""
     );
-    // Set title for print filename
     document.title = printTitle;
-    // Print
     window.print();
-    // Restore title after a short delay
     setTimeout(() => {
       document.title = originalTitle;
     }, 100);
@@ -90,19 +84,14 @@ function RouteComponent() {
       )}
 
       {hasDocument && (
-        <div className="document-preview-shell w-[calc(100%)] overflow-x-auto pr-px font-sans max-sm:text-sm xl:w-full">
-          <div
-            className="bg-white text-black sm:min-w-[600px]"
-            style={{ border: "1px solid #000" }}
-          >
-            {/* Header */}
+        <div className="document-preview-shell w-full overflow-x-auto pr-px font-sans max-sm:text-sm">
+          <div className="border border-black bg-white text-black sm:min-w-150">
             <div className="border-black border-b p-4">
               <div className="flex items-center justify-start">
                 <h2 className="font-normal text-4xl">Invoice</h2>
               </div>
             </div>
 
-            {/* Info Section */}
             <div className="border-black border-b">
               <table className="w-full border-collapse">
                 <tbody>
@@ -144,21 +133,20 @@ function RouteComponent() {
               </table>
             </div>
 
-            {/* Items Table */}
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-black border-b">
-                  <th className="w-[4%] border-black border-r p-3 max-sm:p-2 text-left" />
-                  <th className="w-[61%] border-black border-r p-3 max-sm:p-2 text-left">
+                  <th className="w-1/25 border-black border-r p-3 max-sm:p-2 text-left" />
+                  <th className="w-61/100 border-black border-r p-3 max-sm:p-2 text-left">
                     Item
                   </th>
-                  <th className="w-[10%] border-black border-r p-3 text-center max-sm:hidden">
+                  <th className="w-1/10 border-black border-r p-3 text-center max-sm:hidden">
                     Quantity
                   </th>
-                  <th className="w-[10%] border-black border-r p-3 text-center max-sm:hidden">
+                  <th className="w-1/10 border-black border-r p-3 text-center max-sm:hidden">
                     Rate
                   </th>
-                  <th className="w-[15%] p-3 max-sm:p-2 text-center">Amount</th>
+                  <th className="w-3/20 p-3 max-sm:p-2 text-center">Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,10 +186,8 @@ function RouteComponent() {
                     </td>
                   </tr>
                 ))}
-                {/* Empty rows to fill space if needed, or min-height. For now just rendering items */}
               </tbody>
               <tfoot>
-                {/* Spacer row */}
                 <tr className="border-black border-b">
                   <td className="p-2 max-sm:hidden" colSpan={5}>
                     &nbsp;
@@ -211,7 +197,6 @@ function RouteComponent() {
                   </td>
                 </tr>
 
-                {/* Reductions */}
                 <tr className="border-black border-b">
                   <td />
                   <td className="max-sm:hidden" colSpan={2} />
@@ -224,7 +209,6 @@ function RouteComponent() {
                   </td>
                 </tr>
 
-                {/* Total */}
                 <tr className="border-black border-b">
                   <td />
                   <td className="max-sm:hidden" colSpan={2} />
@@ -238,7 +222,6 @@ function RouteComponent() {
               </tfoot>
             </table>
 
-            {/* Total in Words */}
             <div className="p-4">
               <span className="font-bold">Total (in words) : </span>
               <span className="capitalize">
@@ -249,7 +232,6 @@ function RouteComponent() {
           </div>
         </div>
       )}
-      <DocumentPrintStyles />
     </section>
   );
 }

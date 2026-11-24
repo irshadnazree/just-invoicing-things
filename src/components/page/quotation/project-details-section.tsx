@@ -55,10 +55,7 @@ function ProjectDetailsSectionComponent({
           <Field label="Payment type">
             <Select
               onChange={(event) =>
-                onUpdateField(
-                  "paymentType",
-                  event.target.value as typeof paymentType
-                )
+                onUpdateField("paymentType", event.target.value)
               }
               value={paymentType}
             >

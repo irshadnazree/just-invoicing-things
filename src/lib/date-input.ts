@@ -9,6 +9,6 @@ export function openDatePicker(event: MouseEvent<HTMLInputElement>) {
   try {
     el.showPicker();
   } catch {
-    /* unsupported, not user-activated, or insecure context */
+    // WARNING: showPicker throws when unsupported, not user-activated, or in an insecure context
   }
 }

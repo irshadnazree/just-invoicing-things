@@ -49,7 +49,6 @@ export const useQuotationStore = create<QuotationStore>((set, get) => ({
     set((state) => {
       let updatedFormData = { ...state.formData, [field]: value };
 
-      // If currency is being updated, reset all item currencies to match
       if (field === "currency" && typeof value === "string") {
         updatedFormData = {
           ...updatedFormData,
@@ -298,7 +297,7 @@ export const useQuotationStore = create<QuotationStore>((set, get) => ({
     deleteQuotationsFromStorage([id]);
   },
 
-  bulkDeleteQuotations: (ids: string[]) => {
+  bulkDeleteQuotations: (ids: Array<string>) => {
     deleteQuotationsFromStorage(ids);
   },
 
@@ -315,13 +314,12 @@ export const useQuotationStore = create<QuotationStore>((set, get) => ({
       };
 
       try {
-        // Save the duplicated quotation to localStorage array
         saveQuotationToArray(duplicatedQuotation);
         set({ formData: duplicatedQuotation });
-        return duplicatedQuotation.id; // Return the new ID for navigation
+        return duplicatedQuotation.id;
       } catch (error) {
         console.error("Failed to duplicate quotation:", error);
-        throw new Error("Failed to duplicate quotation");
+        throw new Error("Failed to duplicate quotation", { cause: error });
       }
     }
     return null;

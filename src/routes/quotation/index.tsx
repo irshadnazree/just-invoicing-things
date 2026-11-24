@@ -10,9 +10,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import EmptyListView from "@/components/shared/history/empty-list-view";
 import NoResultSection from "@/components/shared/history/no-result-view";
-import TableView, {
-  type TableColumn,
-} from "@/components/shared/history/table-view";
+import TableView from "@/components/shared/history/table-view";
+import type { TableColumn } from "@/components/shared/history/table-view";
 import { PageHeader } from "@/components/shared/page-header";
 import { calculateQuotationTotal, formatCurrency } from "@/lib/utils";
 import { useQuotationStore } from "@/stores/quotation-store";
@@ -36,7 +35,7 @@ function RouteComponent() {
   );
   const router = useRouter();
 
-  const [quotations, setQuotations] = useState<QuotationFormData[]>([]);
+  const [quotations, setQuotations] = useState<Array<QuotationFormData>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
@@ -88,20 +87,20 @@ function RouteComponent() {
   );
 
   function handleCreateQuotation() {
-    router.navigate({
+    void router.navigate({
       to: "/quotation/$quotation",
       params: { quotation: "new" },
     });
   }
 
   function handleOpenQuotation(id: string) {
-    router.navigate({
+    void router.navigate({
       to: "/quotation/$quotation",
       params: { quotation: id },
     });
   }
 
-  const columns: TableColumn<QuotationListItem>[] = [
+  const columns: Array<TableColumn<QuotationListItem>> = [
     {
       key: "quotationId",
       label: "No.",
@@ -156,7 +155,7 @@ function RouteComponent() {
     },
   ];
 
-  // A selection can't outlive the search that showed it, or bulk delete could hit hidden rows
+  // WARNING: A selection can't outlive the search that showed it, or bulk delete could hit hidden rows
   function handleSearch(value: string) {
     setSearchTerm(value);
     setSelectedQuotations(new Set());
@@ -204,7 +203,7 @@ function RouteComponent() {
       }
     };
 
-    loadQuotations();
+    void loadQuotations();
   }, [getAllQuotationsAsync]);
 
   if (isLoading) {

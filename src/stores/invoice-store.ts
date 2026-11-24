@@ -43,7 +43,6 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     set((state) => {
       let updatedFormData = { ...state.formData, [field]: value };
 
-      // If currency is being updated, reset all item currencies to match
       if (field === "currency" && typeof value === "string") {
         updatedFormData = {
           ...updatedFormData,
@@ -233,7 +232,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     deleteInvoicesFromStorage([id]);
   },
 
-  bulkDeleteInvoices: (ids: string[]) => {
+  bulkDeleteInvoices: (ids: Array<string>) => {
     deleteInvoicesFromStorage(ids);
   },
 
@@ -255,7 +254,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
         return duplicatedInvoice.id;
       } catch (error) {
         console.error("Failed to duplicate invoice:", error);
-        throw new Error("Failed to duplicate invoice");
+        throw new Error("Failed to duplicate invoice", { cause: error });
       }
     }
     return null;

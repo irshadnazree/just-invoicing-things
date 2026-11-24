@@ -1,6 +1,7 @@
-export function loadFromStorage<T>(key: string): T[] {
+export function loadFromStorage<T>(key: string): Array<T> {
   try {
     const stored = localStorage.getItem(key);
+    // oxlint-disable-next-line typescript/no-unsafe-return -- stored by saveToStorage<T>; there is no schema to parse it against yet
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
@@ -8,7 +9,7 @@ export function loadFromStorage<T>(key: string): T[] {
 }
 
 /** Returns false when the browser refuses the write, such as when storage is full. */
-export function saveToStorage<T>(key: string, items: T[]): boolean {
+export function saveToStorage<T>(key: string, items: Array<T>): boolean {
   try {
     localStorage.setItem(key, JSON.stringify(items));
     return true;

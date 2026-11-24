@@ -53,40 +53,37 @@ function Dashboard() {
     (state) => state.getAllQuotationsAsync
   );
 
-  const [invoices, setInvoices] = useState<InvoiceFormData[]>([]);
-  const [quotations, setQuotations] = useState<QuotationFormData[]>([]);
+  const [invoices, setInvoices] = useState<Array<InvoiceFormData>>([]);
+  const [quotations, setQuotations] = useState<Array<QuotationFormData>>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>("all");
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const [loadedInvoices, loadedQuotations] = await Promise.all([
-        getAllInvoicesAsync(),
-        getAllQuotationsAsync(),
-      ]);
-      setInvoices(loadedInvoices);
-      setQuotations(loadedQuotations);
-    } catch (error) {
-      console.error("Failed to load dashboard data:", error);
-      setInvoices([]);
-      setQuotations([]);
-      setError("Failed to load your documents. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [getAllInvoicesAsync, getAllQuotationsAsync]);
+  const loadData = useCallback(
+    () =>
+      Promise.all([getAllInvoicesAsync(), getAllQuotationsAsync()])
+        .then(([loadedInvoices, loadedQuotations]) => {
+          setInvoices(loadedInvoices);
+          setQuotations(loadedQuotations);
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to load dashboard data:", error);
+          setInvoices([]);
+          setQuotations([]);
+          setError("Failed to load your documents. Please try again.");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        }),
+    [getAllInvoicesAsync, getAllQuotationsAsync]
+  );
 
   useEffect(() => {
     void loadData();
   }, [loadData]);
 
-  // Combine and format documents
-  const allDocuments: DocumentItem[] = useMemo(() => {
-    const formattedInvoices: DocumentItem[] = invoices.map((invoice) => {
+  const allDocuments: Array<DocumentItem> = useMemo(() => {
+    const formattedInvoices: Array<DocumentItem> = invoices.map((invoice) => {
       return {
         id: invoice.id,
         documentId: invoice.invoiceId,
@@ -99,18 +96,20 @@ function Dashboard() {
       };
     });
 
-    const formattedQuotations: DocumentItem[] = quotations.map((quotation) => {
-      return {
-        id: quotation.id,
-        documentId: quotation.quotationId,
-        client: quotation.quotationFor?.company || "Unknown Company",
-        date: quotation.quotationDate,
-        total: calculateQuotationTotal(quotation),
-        currency: quotation.currency || "RM",
-        updatedAt: quotation.updatedAt,
-        type: "quotation",
-      };
-    });
+    const formattedQuotations: Array<DocumentItem> = quotations.map(
+      (quotation) => {
+        return {
+          id: quotation.id,
+          documentId: quotation.quotationId,
+          client: quotation.quotationFor?.company || "Unknown Company",
+          date: quotation.quotationDate,
+          total: calculateQuotationTotal(quotation),
+          currency: quotation.currency || "RM",
+          updatedAt: quotation.updatedAt,
+          type: "quotation",
+        };
+      }
+    );
 
     return [...formattedInvoices, ...formattedQuotations].sort(
       (a, b) =>
@@ -118,7 +117,6 @@ function Dashboard() {
     );
   }, [invoices, quotations]);
 
-  // Filter documents based on active tab
   const filteredDocuments = useMemo(() => {
     switch (activeTab) {
       case "invoices":
@@ -130,32 +128,38 @@ function Dashboard() {
     }
   }, [allDocuments, activeTab]);
 
-  // Get recent documents (last 5)
   const recentDocuments = useMemo(
     () => filteredDocuments.slice(0, 5),
     [filteredDocuments]
   );
 
-  // Stats
   const invoiceCount = invoices.length;
   const quotationCount = quotations.length;
   const hasDocuments = invoiceCount > 0 || quotationCount > 0;
 
-  // Handlers
   const handleNewInvoice = () => {
-    navigate({ to: "/invoice/$invoice", params: { invoice: "new" } });
+    void navigate({ to: "/invoice/$invoice", params: { invoice: "new" } });
   };
 
   const handleNewQuotation = () => {
-    navigate({ to: "/quotation/$quotation", params: { quotation: "new" } });
+    void navigate({
+      to: "/quotation/$quotation",
+      params: { quotation: "new" },
+    });
   };
 
   const handleViewInvoices = () => {
-    navigate({ to: "/invoice" });
+    void navigate({ to: "/invoice" });
   };
 
   const handleViewQuotations = () => {
-    navigate({ to: "/quotation" });
+    void navigate({ to: "/quotation" });
+  };
+
+  const handleRetry = () => {
+    setIsLoading(true);
+    setError(null);
+    void loadData();
   };
 
   const isEmpty = !isLoading && !error && !hasDocuments;
@@ -181,7 +185,7 @@ function Dashboard() {
         <Surface variant="dashed">
           <EmptyState
             actions={
-              <Button onClick={() => void loadData()} variant="primary">
+              <Button onClick={handleRetry} variant="primary">
                 Try again
               </Button>
             }

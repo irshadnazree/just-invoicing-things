@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { SaveStatus } from "@/components/shared/save-status";
 import { exportJSON, readJsonFile } from "@/lib/utils";
 import { useQuotationStore } from "@/stores/quotation-store";
+import type { QuotationFormData } from "@/types/quotation";
 import { isQuotationValid } from "@/utils/quotation";
 
 export const Route = createFileRoute("/quotation/$quotation")({
@@ -28,7 +29,9 @@ function RouteComponent() {
   const { add } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasPendingSave = useRef(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [savedFormData, setSavedFormData] = useState<QuotationFormData | null>(
+    null
+  );
 
   const {
     formData,
@@ -46,7 +49,11 @@ function RouteComponent() {
     }))
   );
 
-  // Check if form has unsaved changes (has some data but not valid/saved)
+  const isSaving =
+    Boolean(formData.id) &&
+    isQuotationValid(formData) &&
+    savedFormData !== formData;
+
   const hasUnsavedChanges = Boolean(
     formData.id &&
     formData.id !== "" &&
@@ -59,7 +66,6 @@ function RouteComponent() {
       formData.terms.length > 0)
   );
 
-  // Setup navigation warning
   const {
     isDialogOpen,
     confirmNavigation,
@@ -78,27 +84,23 @@ function RouteComponent() {
     cancelLabel: "Stay",
   });
 
-  // Load quotation on component mount
   useEffect(() => {
-    // Persist the previous quotation's last edits before replacing it in the store
+    // WARNING: Persist the previous quotation's last edits before replacing it in the store
     if (hasPendingSave.current) {
       hasPendingSave.current = false;
       saveQuotation();
     }
     if (quotationId === "new") {
-      // Create new quotation
       initializeQuotation();
     } else {
-      // An unsaved draft is only in memory, so keep it rather than reloading from storage
+      // WARNING: An unsaved draft is only in memory, so keep it rather than reloading from storage
       if (useQuotationStore.getState().formData.id === quotationId) {
         return;
       }
-      // Try to load existing quotation
       const loaded = loadQuotation(quotationId);
       if (!loaded) {
-        // Quotation not found, redirect to create new
         initializeQuotation();
-        router.navigate({
+        void router.navigate({
           to: "/quotation/$quotation",
           params: { quotation: "new" },
         });
@@ -106,22 +108,18 @@ function RouteComponent() {
     }
   }, [quotationId, loadQuotation, initializeQuotation, router, saveQuotation]);
 
-  // Auto-save when form data changes with debounce
   useEffect(() => {
     if (!formData.id || !isQuotationValid(formData)) {
-      setIsSaving(false);
       return;
     }
 
-    setIsSaving(true);
     hasPendingSave.current = true;
 
     const timeoutId = setTimeout(() => {
       hasPendingSave.current = false;
       const success = saveQuotation();
-      setIsSaving(false);
+      setSavedFormData(formData);
 
-      // Only show toast on error, success is shown via SaveIndicator
       if (!success) {
         add({
           title: "Failed to save quotation",
@@ -130,12 +128,12 @@ function RouteComponent() {
           type: "error",
         });
       }
-    }, 1000); // Debounce save by 1 second
+    }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [formData, saveQuotation, add]);
 
-  // Leaving within the debounce window would otherwise drop the last edits
+  // WARNING: Leaving within the debounce window would otherwise drop the last edits
   useEffect(
     () => () => {
       if (hasPendingSave.current) {
@@ -167,6 +165,7 @@ function RouteComponent() {
 
     try {
       const jsonData = await readJsonFile(file);
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- imported JSON is trusted to be an export from this app
       importJSON(jsonData as Parameters<typeof importJSON>[0]);
 
       event.target.value = "";
@@ -194,7 +193,7 @@ function RouteComponent() {
             <input
               accept="application/json,.json"
               className="hidden"
-              onChange={(event) => handleImportJSON(event)}
+              onChange={(event) => void handleImportJSON(event)}
               ref={fileInputRef}
               tabIndex={-1}
               type="file"
@@ -209,7 +208,9 @@ function RouteComponent() {
             </Button>
             {formData.id && formData.id !== "" && (
               <Button
-                onClick={() => router.navigate({ to: "/quotation/preview" })}
+                onClick={() =>
+                  void router.navigate({ to: "/quotation/preview" })
+                }
                 variant="primary"
               >
                 <EyeIcon size={16} weight="bold" />
@@ -222,7 +223,7 @@ function RouteComponent() {
           <Button
             aria-label="Back to quotations"
             iconOnly
-            onClick={() => router.navigate({ to: "/quotation" })}
+            onClick={() => void router.navigate({ to: "/quotation" })}
             variant="ghost"
           >
             <ArrowUUpLeftIcon size={16} weight="bold" />

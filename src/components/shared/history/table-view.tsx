@@ -26,13 +26,13 @@ export type TableColumn<TItem> = {
 };
 
 type TableViewProps<TItem extends { id: string }, TStoredItem> = {
-  items: TItem[];
-  columns: TableColumn<TItem>[];
-  setItems: (items: TStoredItem[]) => void;
+  items: Array<TItem>;
+  columns: Array<TableColumn<TItem>>;
+  setItems: (items: Array<TStoredItem>) => void;
   selectedItems: Set<string>;
   setSelectedItems: (selectedItems: Set<string>) => void;
   setPendingDeleteId: (pendingDeleteId: string | null) => void;
-  loadItems: () => Promise<TStoredItem[]>;
+  loadItems: () => Promise<Array<TStoredItem>>;
   duplicateItem: (id: string) => string | null;
   openItem: (id: string) => void;
   /** Below this the table scrolls inside its card instead of squeezing columns */
@@ -63,7 +63,7 @@ export default function TableView<TItem extends { id: string }, TStoredItem>({
     setSelectedItems(newSelection);
   }
 
-  // Select all acts on the rows on screen only, so a filter can't hide a selected row
+  // WARNING: Select all acts on the rows on screen only, so a filter can't hide a selected row
   const visibleSelectedCount = items.filter((item) =>
     selectedItems.has(item.id)
   ).length;
@@ -113,6 +113,7 @@ export default function TableView<TItem extends { id: string }, TStoredItem>({
             {columns.map((column) => (
               <TableHead
                 align={column.numeric ? "right" : "left"}
+                // oxlint-disable-next-line shadcn/require-static-classes -- widths are static strings in each route's column config
                 className={column.width}
                 key={column.key}
               >
@@ -120,7 +121,6 @@ export default function TableView<TItem extends { id: string }, TStoredItem>({
               </TableHead>
             ))}
 
-            {/* relative: anchors the visually hidden label inside the scrolling card */}
             <TableHead className="relative w-40">
               <span className="jt-visually-hidden">Actions</span>
             </TableHead>
@@ -145,6 +145,7 @@ export default function TableView<TItem extends { id: string }, TStoredItem>({
                   <TableCell
                     className={cn(
                       "overflow-hidden",
+                      // oxlint-disable-next-line shadcn/require-static-classes -- widths and cell classes are static strings in each route's column config
                       column.width,
                       column.cellClassName
                     )}

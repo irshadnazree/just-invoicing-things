@@ -2,7 +2,6 @@ import { Button, EmptyState, Surface } from "@irshadnazree/just-things-ui";
 import { ArrowUUpLeftIcon, PrinterIcon } from "@phosphor-icons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { DocumentPrintStyles } from "@/components/shared/document-print-styles";
 import { PageHeader } from "@/components/shared/page-header";
 import { formatDecimal, generatePrintFilename } from "@/lib/utils";
 import { useQuotationData } from "@/stores/quotation-store";
@@ -16,6 +15,34 @@ import {
 export const Route = createFileRoute("/quotation/preview")({
   component: RouteComponent,
 });
+
+function renderPaymentRow(params: {
+  label: string;
+  value: number;
+  currency: string;
+  percent?: number;
+  isBold?: boolean;
+  key: string;
+}) {
+  return (
+    <tr className="border-black border-b" key={params.key}>
+      <td />
+      <td className="max-sm:hidden" />
+      <td className="max-sm:hidden" />
+      <td
+        className={`whitespace-nowrap border-black border-x p-3 max-sm:p-2 text-left ${params.isBold ? "font-bold" : ""}`}
+      >
+        {params.label}
+        {params.percent !== undefined && <span> ({params.percent}%)</span>}
+      </td>
+      <td
+        className={`whitespace-nowrap p-3 max-sm:p-2 text-left tabular-nums ${params.isBold ? "font-bold" : ""}`}
+      >
+        {params.currency} {formatDecimal(params.value, 2)}
+      </td>
+    </tr>
+  );
+}
 
 function RouteComponent() {
   const formData = useQuotationData();
@@ -42,26 +69,21 @@ function RouteComponent() {
   const hasDocument = formData.id !== "";
 
   function goBack() {
-    navigate({
+    void navigate({
       to: "/quotation/$quotation",
       params: { quotation: formData.id || "new" },
     });
   }
 
   function printQuotation() {
-    // Save original title
     const originalTitle = document.title;
-    // Create filename from quotation details
     const printTitle = generatePrintFilename(
       formData.quotationFrom.company || "",
       formData.quotationFor.company || "",
       formData.quotationId || ""
     );
-    // Set title for print filename
     document.title = printTitle;
-    // Print
     window.print();
-    // Restore title after a short delay
     setTimeout(() => {
       document.title = originalTitle;
     }, 100);
@@ -77,34 +99,6 @@ function RouteComponent() {
       return 100 - formData.depositPercent - formData.secondPaymentPercent;
     }
     return 100 - formData.depositPercent;
-  }
-
-  function renderPaymentRow(params: {
-    label: string;
-    value: number;
-    currency: string;
-    percent?: number;
-    isBold?: boolean;
-    key: string;
-  }) {
-    return (
-      <tr className="border-black border-b" key={params.key}>
-        <td />
-        <td className="max-sm:hidden" />
-        <td className="max-sm:hidden" />
-        <td
-          className={`whitespace-nowrap border-black border-x p-3 max-sm:p-2 text-left ${params.isBold ? "font-bold" : ""}`}
-        >
-          {params.label}
-          {params.percent !== undefined && <span> ({params.percent}%)</span>}
-        </td>
-        <td
-          className={`whitespace-nowrap p-3 max-sm:p-2 text-left tabular-nums ${params.isBold ? "font-bold" : ""}`}
-        >
-          {params.currency} {formatDecimal(params.value, 2)}
-        </td>
-      </tr>
-    );
   }
 
   function renderCurrencyFooter(currency: string) {
@@ -196,26 +190,21 @@ function RouteComponent() {
       )}
 
       {hasDocument && (
-        <div className="document-preview-shell w-[calc(100%)] overflow-x-auto pr-px font-sans max-sm:text-sm xl:w-full">
-          <div
-            className="bg-white text-black sm:min-w-[600px]"
-            style={{ border: "2px solid #000" }}
-          >
-            {/* Header */}
+        <div className="document-preview-shell w-full overflow-x-auto pr-px font-sans max-sm:text-sm">
+          <div className="border-2 border-black bg-white text-black sm:min-w-150">
             <div className="border-black border-b-2 p-4">
               <div className="flex items-center justify-between">
                 <h2 className="font-bold text-2xl">
                   {formData.projectTitle || "Quotation"}
                 </h2>
                 <div className="flex gap-2">
-                  <span className="self-center text-neutral-600">
+                  <span className="self-center text-black/60">
                     {formData.paymentType}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Info Section */}
             <div className="border-black border-b-2">
               <table className="w-full">
                 <tbody>
@@ -259,7 +248,6 @@ function RouteComponent() {
               </table>
             </div>
 
-            {/* Items Table */}
             <table className="w-full">
               <thead>
                 <tr className="border-black border-b-2">
@@ -324,7 +312,6 @@ function RouteComponent() {
               </tfoot>
             </table>
 
-            {/* Terms and Conditions */}
             <div className="p-3 max-sm:p-2">
               <h3 className="mb-2 font-bold">Terms and Conditions</h3>
               <ol className="space-y-1">
@@ -338,7 +325,6 @@ function RouteComponent() {
           </div>
         </div>
       )}
-      <DocumentPrintStyles />
     </section>
   );
 }

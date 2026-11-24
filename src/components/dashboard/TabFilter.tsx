@@ -8,7 +8,7 @@ type Tab<T extends string> = {
 type TabFilterProps<T extends string> = {
   activeTab: T;
   onTabChange: (tabId: T) => void;
-  tabs: readonly Tab<T>[];
+  tabs: ReadonlyArray<Tab<T>>;
 };
 
 export function TabFilter<T extends string>({

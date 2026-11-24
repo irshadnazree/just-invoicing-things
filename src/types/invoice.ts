@@ -2,7 +2,7 @@ import type { CompanyInfo } from "@/types/shared";
 
 export type InvoiceLineItem = {
   name: string;
-  details: string[];
+  details: Array<string>;
   code: string;
   quantity: number;
   rate: number;
@@ -29,7 +29,7 @@ export type InvoiceFormData = {
   bankAccount: string;
   invoiceFrom: CompanyInfo;
   invoiceTo: CompanyInfo;
-  items: InvoiceLineItem[];
+  items: Array<InvoiceLineItem>;
   currency: string;
   reductionAmount: number;
 };
@@ -65,13 +65,12 @@ export type InvoiceStore = {
       items?: Array<InvoiceLineItem & { amount?: number }>;
     }
   ) => void;
-  // localStorage array operations
   saveInvoice: () => boolean;
   loadInvoice: (id: string) => boolean;
-  getAllInvoices: () => InvoiceFormData[];
-  getAllInvoicesAsync: () => Promise<InvoiceFormData[]>;
+  getAllInvoices: () => Array<InvoiceFormData>;
+  getAllInvoicesAsync: () => Promise<Array<InvoiceFormData>>;
   deleteInvoice: (id: string) => void;
-  bulkDeleteInvoices: (ids: string[]) => void;
+  bulkDeleteInvoices: (ids: Array<string>) => void;
   duplicateInvoice: (id: string) => string | null;
   initializeInvoice: () => void;
   isValidInvoice: () => boolean;

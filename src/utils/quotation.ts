@@ -14,11 +14,14 @@ const DEFAULT_QUOTATION_ID = `QUO-${currentYear}-001`;
 export function generateId(formData: QuotationFormData): QuotationFormData {
   const today = new Date().toISOString().split("T")[0];
 
-  // Load existing quotations to generate next ID
   const existingQuotations = loadQuotationsFromStorage();
   const nextQuotationId =
     formData.quotationId ||
-    getNextDisplayId(existingQuotations, "quotationId", DEFAULT_QUOTATION_ID);
+    getNextDisplayId(
+      existingQuotations,
+      (quotation) => quotation.quotationId,
+      DEFAULT_QUOTATION_ID
+    );
 
   return {
     ...formData,
@@ -28,11 +31,13 @@ export function generateId(formData: QuotationFormData): QuotationFormData {
   };
 }
 
-export function loadQuotationsFromStorage(): QuotationFormData[] {
+export function loadQuotationsFromStorage(): Array<QuotationFormData> {
   return loadFromStorage<QuotationFormData>(STORAGE_KEY);
 }
 
-export function saveQuotationsToStorage(quotations: QuotationFormData[]): void {
+export function saveQuotationsToStorage(
+  quotations: Array<QuotationFormData>
+): void {
   saveToStorage(STORAGE_KEY, quotations);
 }
 
@@ -40,16 +45,14 @@ export function findQuotationById(id: string): QuotationFormData | null {
   return findItemById<QuotationFormData>(STORAGE_KEY, id);
 }
 
-export function deleteQuotationsFromStorage(ids: string[]): void {
+export function deleteQuotationsFromStorage(ids: Array<string>): void {
   const idsToDelete = new Set(ids);
   const quotations = loadQuotationsFromStorage();
   const filteredQuotations = quotations.filter((q) => !idsToDelete.has(q.id));
   saveQuotationsToStorage(filteredQuotations);
 }
 
-// Validate that quotation has required fields filled
 export function isQuotationValid(quotationData: QuotationFormData): boolean {
-  // Check required fields are not empty
   const hasQuotationId = quotationData.quotationId.trim() !== "";
   const hasProjectTitle = quotationData.projectTitle.trim() !== "";
 

@@ -4,10 +4,11 @@ import { memo } from "react";
 import { SectionHeading } from "@/components/shared/page-header";
 import { openDatePicker } from "@/lib/date-input";
 import { useInvoiceData } from "@/stores/invoice-store";
+import type { InvoiceStore } from "@/types/invoice";
 
 type ProjectDetailsSectionProps = {
-  onUpdateField: (field: string, value: unknown) => void;
-  onUpdateNestedField: (parent: string, field: string, value: unknown) => void;
+  onUpdateField: InvoiceStore["updateField"];
+  onUpdateNestedField: InvoiceStore["updateNestedField"];
 };
 
 function ProjectDetailsSectionComponent({

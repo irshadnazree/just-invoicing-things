@@ -2,7 +2,7 @@ import type { CompanyInfo } from "@/types/shared";
 
 type QuotationLineItem = {
   name: string;
-  details: string[];
+  details: Array<string>;
   quantity: number;
   rate: number;
   currency: string;
@@ -32,12 +32,12 @@ type QuotationFormData = {
   quotationFor: CompanyInfo;
   projectTitle: string;
   paymentType: string;
-  items: QuotationLineItem[];
+  items: Array<QuotationLineItem>;
   currency: string;
   depositPercent: number;
   hasSecondPayment: boolean;
   secondPaymentPercent: number;
-  terms: string[];
+  terms: Array<string>;
 };
 
 type QuotationStore = {
@@ -75,13 +75,12 @@ type QuotationStore = {
       items?: Array<QuotationLineItem & { amount?: number }>;
     }
   ) => void;
-  // localStorage array operations
   saveQuotation: () => boolean;
   loadQuotation: (id: string) => boolean;
-  getAllQuotations: () => QuotationFormData[];
-  getAllQuotationsAsync: () => Promise<QuotationFormData[]>;
+  getAllQuotations: () => Array<QuotationFormData>;
+  getAllQuotationsAsync: () => Promise<Array<QuotationFormData>>;
   deleteQuotation: (id: string) => void;
-  bulkDeleteQuotations: (ids: string[]) => void;
+  bulkDeleteQuotations: (ids: Array<string>) => void;
   duplicateQuotation: (id: string) => string | null;
   initializeQuotation: () => void;
   isValidQuotation: () => boolean;

@@ -12,23 +12,22 @@ import Navbar from "@/components/shared/navbar";
 
 import appCss from "../styles.css?url";
 
-// --jt-base in each theme, for the browser's own chrome
 const THEME_COLORS = { light: "#edece7", dark: "#0c0d0f" } as const;
 
-// Before just-things-ui the choice lived in a cookie; carry it over once, before themeScript reads it.
+// WARNING: Before just-things-ui the choice lived in a cookie; carry it over once, before themeScript reads it.
 const legacyThemeScript = `(function(){try{if(localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}))return;var m=document.cookie.match(/(?:^|; )_preferred-theme=(light|dark)(?:;|$)/);if(m)localStorage.setItem(${JSON.stringify(THEME_STORAGE_KEY)},m[1]);document.cookie="_preferred-theme=; Max-Age=0; path=/"}catch(e){}})()`;
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
+        // oxlint-disable-next-line unicorn/text-encoding-identifier-case -- HTML requires the "utf-8" label
         charSet: "utf-8",
       },
       {
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
-      // Follows the system until hydration; ThemeColor then follows the chosen theme
       {
         name: "theme-color",
         content: THEME_COLORS.light,
@@ -61,8 +60,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Puts the stored theme on <html> before the first paint */}
-        {/* oxlint-disable-next-line react/no-danger */}
         <script
           dangerouslySetInnerHTML={{
             __html: `${legacyThemeScript};${themeScript}`,
@@ -94,7 +91,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Points both theme-color tags at the resolved theme, so a forced theme wins over the system. */
 function ThemeColor() {
   const { resolvedTheme } = useTheme();
   useEffect(() => {

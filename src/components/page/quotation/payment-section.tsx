@@ -10,7 +10,7 @@ import { useQuotationCalculations } from "@/components/hooks/use-quotation-calcu
 import { SectionHeading } from "@/components/shared/page-header";
 import { cn, formatDecimal } from "@/lib/utils";
 
-// Base UI rounds to maximumFractionDigits on blur; keep what's stored
+// WARNING: Base UI rounds to maximumFractionDigits on blur; keep what's stored
 const EXACT_FORMAT = { maximumFractionDigits: 20 };
 import { useQuotationPaymentConfig } from "@/stores/quotation-store";
 import type { QuotationStore } from "@/types/quotation";

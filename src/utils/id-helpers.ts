@@ -23,7 +23,6 @@ export function incrementCodeFlexible(code: string) {
   return prefix + next;
 }
 
-// Regex for display IDs like "QUO-2026-001" or "INV-2026-001" (Type-Year-Number)
 const DISPLAY_ID_REGEX = /^([A-Z]{3})-(\d{4})-(\d{3})$/;
 
 /**
@@ -42,14 +41,12 @@ export function incrementDisplayId(
   const [, prefix, year, digits] = match;
   const currentYear = new Date().getFullYear().toString();
 
-  // If year doesn't match current year, start from 001
   if (year !== currentYear) {
     return `${prefix}-${currentYear}-001`;
   }
 
   const num = Number.parseInt(digits, 10);
 
-  // Check if incrementing would exceed 3 digits
   if (num >= 999) {
     return defaultId;
   }
@@ -58,31 +55,25 @@ export function incrementDisplayId(
   return `${prefix}-${year}-${next}`;
 }
 
-type ItemWithDisplayId = {
-  [key: string]: unknown;
-  updatedAt: string;
-};
-
 /**
  * Get the next display ID based on the most recent item
  * Finds item with latest updatedAt, extracts ID, and increments it
  * Returns defaultId if no items or pattern doesn't match
  */
-export function getNextDisplayId<T extends ItemWithDisplayId>(
-  items: T[],
-  idField: keyof T,
+export function getNextDisplayId<T extends { updatedAt: string }>(
+  items: Array<T>,
+  getDisplayId: (item: T) => string,
   defaultId: string
 ): string {
   if (items.length === 0) {
     return defaultId;
   }
 
-  // Find the most recent item by updatedAt
   const mostRecent = items.reduce((latest, current) =>
     new Date(current.updatedAt) > new Date(latest.updatedAt) ? current : latest
   );
 
-  const currentId = mostRecent[idField] as string;
+  const currentId = getDisplayId(mostRecent);
 
   if (!currentId || currentId.trim() === "") {
     return defaultId;

@@ -1,6 +1,6 @@
 import type { QuotationLineItem } from "@/types/quotation";
 
-export function getTotalByCurrency(lineItems: QuotationLineItem[]) {
+export function getTotalByCurrency(lineItems: Array<QuotationLineItem>) {
   const totals: Record<string, number> = {};
   for (const item of lineItems) {
     const itemCurrency = item.currency;

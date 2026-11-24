@@ -12,13 +12,14 @@ import {
   useInvoiceItems,
   useInvoiceReduction,
 } from "@/stores/invoice-store";
+import type { InvoiceStore } from "@/types/invoice";
 import { numberToWords } from "@/utils/format";
 
 type SummarySectionProps = {
-  onUpdateField: (field: string, value: unknown) => void;
+  onUpdateField: InvoiceStore["updateField"];
 };
 
-// Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
+// WARNING: Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
 const MONEY_FORMAT = { minimumFractionDigits: 2, maximumFractionDigits: 20 };
 
 export default function SummarySection({ onUpdateField }: SummarySectionProps) {

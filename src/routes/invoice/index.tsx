@@ -10,9 +10,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import EmptyListView from "@/components/shared/history/empty-list-view";
 import NoResultSection from "@/components/shared/history/no-result-view";
-import TableView, {
-  type TableColumn,
-} from "@/components/shared/history/table-view";
+import TableView from "@/components/shared/history/table-view";
+import type { TableColumn } from "@/components/shared/history/table-view";
 import { PageHeader } from "@/components/shared/page-header";
 import { calculateInvoiceTotal, formatCurrency } from "@/lib/utils";
 import { initialFormData, useInvoiceStore } from "@/stores/invoice-store";
@@ -33,7 +32,7 @@ function RouteComponent() {
   } = useInvoiceStore();
   const router = useRouter();
 
-  const [invoices, setInvoices] = useState<InvoiceFormData[]>([]);
+  const [invoices, setInvoices] = useState<Array<InvoiceFormData>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
@@ -82,19 +81,19 @@ function RouteComponent() {
   );
 
   function handleCreateInvoice() {
-    const newInvoice = generateId(initialFormData as InvoiceFormData);
+    const newInvoice = generateId(initialFormData);
 
     handleOpenInvoice(newInvoice.id);
   }
 
   function handleOpenInvoice(id: string) {
-    router.navigate({
+    void router.navigate({
       to: "/invoice/$invoice",
       params: { invoice: id },
     });
   }
 
-  const columns: TableColumn<InvoiceListItem>[] = [
+  const columns: Array<TableColumn<InvoiceListItem>> = [
     {
       key: "invoiceId",
       label: "No.",
@@ -138,7 +137,7 @@ function RouteComponent() {
     },
   ];
 
-  // A selection can't outlive the search that showed it, or bulk delete could hit hidden rows
+  // WARNING: A selection can't outlive the search that showed it, or bulk delete could hit hidden rows
   function handleSearch(value: string) {
     setSearchTerm(value);
     setSelectedInvoices(new Set());
@@ -186,7 +185,7 @@ function RouteComponent() {
       }
     };
 
-    loadInvoices();
+    void loadInvoices();
   }, [getAllInvoicesAsync]);
 
   if (isLoading) {

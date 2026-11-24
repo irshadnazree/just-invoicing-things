@@ -140,7 +140,12 @@ bun run test
 
 ### Code Quality
 
-This project uses Biome for linting and formatting. The configuration is in `biome.jsonc`.
+This project lints with Oxlint and formats with oxfmt. Linting uses `@cloudflare/oxlint-config` (type-aware, via `tsrs`), `@interfere/landmines` (recommended rules plus `no-comments`) and `@shadcn/lint`, configured in `oxlint.config.ts`. Formatting is configured in `.oxfmtrc.json`.
+
+```bash
+bun run check   # lint + format check
+bun run fix     # autofix + format
+```
 
 ### Type Generation
 

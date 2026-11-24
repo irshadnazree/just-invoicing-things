@@ -22,7 +22,7 @@ import {
   useUpdateItemDetail,
 } from "@/stores/quotation-store";
 
-// Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
+// WARNING: Show cents, but never round what's stored: Base UI rounds to maximumFractionDigits on blur
 const MONEY_FORMAT = { minimumFractionDigits: 2, maximumFractionDigits: 20 };
 const EXACT_FORMAT = { maximumFractionDigits: 20 };
 
@@ -164,7 +164,6 @@ export default function LineItemSection() {
                 {item.details.map((detail, detailIndex) => (
                   <div
                     className="flex items-center gap-2"
-                    // biome-ignore lint/suspicious/noArrayIndexKey: Details are not reordered, stable index prevents focus loss
                     key={`detail-${itemIndex}-${detailIndex}`}
                   >
                     <Input

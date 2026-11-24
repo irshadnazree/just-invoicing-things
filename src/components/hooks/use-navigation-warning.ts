@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export type UseNavigationWarningProps = {
   enabled: boolean;
   /** Paths that can be visited without a warning, e.g. a preview that keeps the draft */
-  allowedPaths?: string[];
+  allowedPaths?: Array<string>;
   title?: string;
   description?: string;
   confirmLabel?: string;
@@ -30,13 +30,12 @@ export function useNavigationWarning({
   cancelLabel = "Stay",
 }: UseNavigationWarningProps): NavigationWarningState {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // A ref, so the dialog closing right after Leave can't also reset the navigation it just let through
+  // WARNING: A ref, so the dialog closing right after Leave can't also reset the navigation it just let through
   const pendingNavigation = useRef<{
     proceed: () => void;
     reset: () => void;
   } | null>(null);
 
-  // Block navigation when enabled
   const blocker = useBlocker({
     shouldBlockFn: ({ next }) =>
       enabled && !allowedPaths.includes(next.pathname),
@@ -46,6 +45,7 @@ export function useNavigationWarning({
 
   useEffect(() => {
     if (blocker.status === "blocked") {
+      // oxlint-disable-next-line react/set-state-in-effect -- mirrors the router's blocker into dialog state
       setIsDialogOpen(true);
       pendingNavigation.current = {
         proceed: blocker.proceed,
@@ -54,14 +54,12 @@ export function useNavigationWarning({
     }
   }, [blocker]);
 
-  // Handle browser beforeunload event
   useEffect(() => {
     if (!enabled) {
       return;
     }
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      // Request the browser's generic unload confirmation dialog.
       event.preventDefault();
     };
 
