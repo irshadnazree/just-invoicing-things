@@ -6,6 +6,6 @@ export default defineConfig({
     compatibilityDate: "2026-10-29",
     compatibilityFlags: ["nodejs_compat"],
     entrypoint: "@tanstack/react-start/server-entry",
-    domains: ["invoicing.ruxera.com"],
+    domains: ["finance.ruxera.com"],
   },
 });
