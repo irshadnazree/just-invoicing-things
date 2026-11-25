@@ -19,7 +19,7 @@
     "**/node_modules",
     "**/dist",
     "**/build",
-    "worker-configuration.d.ts",
+    "**/.cloudflare",
     "routeTree.gen.ts"
   ]
 }

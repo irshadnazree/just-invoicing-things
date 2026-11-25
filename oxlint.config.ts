@@ -52,7 +52,7 @@ export default defineConfig({
     ".tanstack/**",
     ".taste-skill/**",
     "verification/**",
-    "worker-configuration.d.ts",
+    ".cloudflare/**",
     "src/routeTree.gen.ts",
   ],
   jsPlugins: [...landminesRecommended.jsPlugins, "@shadcn/lint"],
